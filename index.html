@@ -3,58 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Graficador AMMDK | Sistema de Gestión de Torneos</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <title>Graficador AMMDK | Sistema de Gestión</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        /* PALETA DE COLORES AMMDK */
+        /* PALETA MDK OFICIAL (Basada en ammdk.org) */
         :root {
-            --ammdk-blue: #002349;       /* Azul Institucional */
-            --ammdk-blue-light: #003a7a;
-            --ammdk-gold: #c5a059;       /* Dorado de gala */
-            --ammdk-gold-light: #e0c28d;
-            --ammdk-white: #ffffff;
-            --ammdk-gray: #f4f4f4;
-            --ammdk-dark: #1a1a1a;
+            --mdk-green: #006837;       /* Verde institucional MDK */
+            --mdk-green-light: #009245;
+            --mdk-yellow: #f9ed32;      /* Amarillo brillante MDK */
+            --mdk-black: #1a1a1a;
+            --mdk-white: #ffffff;
+            --mdk-gray: #f2f2f2;
             
             /* Status */
-            --status-green: #2ecc71;
-            --status-yellow: #f1c40f;
-            --status-red: #e74c3c;
+            --status-ok: #27ae60;
+            --status-warn: #f39c12;
+            --status-danger: #c0392b;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body { 
-            font-family: 'Roboto', sans-serif; 
-            background-color: var(--ammdk-gray); 
-            color: var(--ammdk-dark);
+            font-family: 'Open Sans', sans-serif; 
+            background-color: var(--mdk-gray); 
+            color: var(--mdk-black);
             display: flex;
             height: 100vh;
             overflow: hidden;
         }
 
-        /* SIDEBAR */
+        /* SIDEBAR ESTILO MDK */
         .sidebar {
             width: 280px;
-            background-color: var(--ammdk-blue);
+            background-color: var(--mdk-black);
             color: white;
             display: flex;
             flex-direction: column;
-            box-shadow: 4px 0 10px rgba(0,0,0,0.1);
             z-index: 10;
         }
 
         .sidebar-header {
             padding: 30px 20px;
             text-align: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            background-color: var(--mdk-white); /* Fondo blanco para el logo */
+            border-bottom: 5px solid var(--mdk-green);
+        }
+
+        .sidebar-header img {
+            max-width: 120px;
+            height: auto;
+            margin-bottom: 10px;
         }
 
         .sidebar-header h2 {
             font-family: 'Montserrat', sans-serif;
-            font-size: 1.4rem;
-            color: var(--ammdk-gold);
-            letter-spacing: 1px;
+            font-size: 1.1rem;
+            color: var(--mdk-green);
+            font-weight: 700;
         }
 
         .sidebar-nav {
@@ -66,22 +71,27 @@
             display: block;
             width: 100%;
             padding: 15px 20px;
-            margin-bottom: 8px;
-            color: white;
+            margin-bottom: 5px;
+            color: #ccc;
             text-decoration: none;
-            border-radius: 5px;
+            border-radius: 4px;
             border: none;
             background: transparent;
             text-align: left;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
         }
 
-        .nav-item:hover, .nav-item.active {
-            background-color: var(--ammdk-gold);
-            color: var(--ammdk-blue);
-            font-weight: 700;
+        .nav-item:hover {
+            color: var(--mdk-white);
+            background-color: rgba(255,255,255,0.05);
+        }
+
+        .nav-item.active {
+            background-color: var(--mdk-green);
+            color: var(--mdk-yellow); /* Texto amarillo sobre verde */
         }
 
         /* MAIN CONTENT */
@@ -90,13 +100,12 @@
             display: flex;
             flex-direction: column;
             overflow-y: auto;
-            background: #fff;
         }
 
         header.top-bar {
-            padding: 20px 40px;
-            background: var(--ammdk-white);
-            border-bottom: 2px solid var(--ammdk-blue);
+            padding: 15px 40px;
+            background: var(--mdk-white);
+            border-bottom: 1px solid #ddd;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -104,23 +113,22 @@
 
         header h1 {
             font-family: 'Montserrat', sans-serif;
-            font-size: 1.5rem;
-            color: var(--ammdk-blue);
+            font-size: 1.3rem;
+            color: var(--mdk-green);
+            text-transform: uppercase;
         }
 
         .search-box input {
             padding: 10px 20px;
-            border: 1px solid #ddd;
-            border-radius: 20px;
+            border: 2px solid var(--mdk-green);
+            border-radius: 4px;
             width: 300px;
             outline: none;
         }
 
-        .content-padding {
-            padding: 30px 40px;
-        }
+        .content-padding { padding: 30px 40px; }
 
-        /* KPI CARDS */
+        /* KPI CARDS (Verde con acento amarillo) */
         .kpi-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -129,16 +137,16 @@
         }
 
         .kpi-card {
-            background: var(--ammdk-blue);
-            color: white;
-            padding: 25px;
-            border-radius: 8px;
-            border-bottom: 4px solid var(--ammdk-gold);
-            text-align: center;
+            background: var(--mdk-white);
+            padding: 20px;
+            border-radius: 2px;
+            border-top: 5px solid var(--mdk-green);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            text-align: left;
         }
 
-        .kpi-card h3 { font-size: 0.8rem; text-transform: uppercase; color: var(--ammdk-gold-light); opacity: 0.9; }
-        .kpi-card .value { font-size: 2.5rem; font-weight: 700; margin-top: 10px; }
+        .kpi-card h3 { font-size: 0.75rem; text-transform: uppercase; color: #666; }
+        .kpi-card .value { font-size: 2.2rem; font-weight: 700; color: var(--mdk-green); margin-top: 5px; }
 
         /* AREAS GRID */
         .areas-grid {
@@ -148,35 +156,23 @@
         }
 
         .area-card {
-            background: #fff;
-            border: 1px solid #eee;
-            border-radius: 10px;
+            background: var(--mdk-white);
+            border: 1px solid #ddd;
             padding: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             cursor: pointer;
-            transition: transform 0.2s ease;
-            position: relative;
-            overflow: hidden;
+            transition: all 0.2s ease;
+            border-left: 8px solid var(--mdk-gray);
         }
 
-        .area-card:hover { transform: translateY(-5px); border-color: var(--ammdk-gold); }
-
-        .area-card h4 { color: var(--ammdk-blue); border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px; }
+        .area-card:hover { border-color: var(--mdk-green); background-color: #fafafa; }
         
-        .status-pill {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: bold;
-            color: white;
-        }
+        .area-card.status-verde { border-left-color: var(--status-ok); }
+        .area-card.status-amarillo { border-left-color: var(--status-warn); }
+        .area-card.status-rojo { border-left-color: var(--status-danger); }
 
-        .bg-verde { background-color: var(--status-green); }
-        .bg-amarillo { background-color: var(--status-yellow); color: #333; }
-        .bg-rojo { background-color: var(--status-red); }
+        .area-card h4 { color: var(--mdk-green); margin-bottom: 5px; font-family: 'Montserrat'; }
 
-        /* DRAWER */
+        /* DRAWER & OVERLAY */
         .drawer {
             position: fixed;
             right: -450px;
@@ -184,10 +180,10 @@
             width: 450px;
             height: 100%;
             background: white;
-            box-shadow: -5px 0 20px rgba(0,0,0,0.2);
-            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: -10px 0 30px rgba(0,0,0,0.2);
+            transition: 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
             z-index: 100;
-            padding: 30px;
+            padding: 40px;
         }
 
         .drawer.open { right: 0; }
@@ -196,34 +192,27 @@
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0, 35, 73, 0.6);
+            background: rgba(0, 104, 55, 0.3); /* Verde MDK con transparencia */
+            backdrop-filter: blur(2px);
             z-index: 90;
         }
 
         .overlay.active { display: block; }
 
-        .close-btn {
-            background: none;
-            border: none;
-            font-size: 2rem;
-            cursor: pointer;
-            color: var(--ammdk-blue);
-            float: right;
-        }
-
-        /* TABLES */
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.9rem; }
-        th { background: var(--ammdk-blue); color: white; padding: 12px; text-align: left; }
-        td { padding: 12px; border-bottom: 1px solid #eee; }
-        tr:hover { background-color: #f9f9f9; }
+        /* TABLAS ESTILO PROFESIONAL */
+        table { width: 100%; border-collapse: collapse; background: white; }
+        th { background: var(--mdk-green); color: var(--mdk-yellow); padding: 15px; text-align: left; font-family: 'Montserrat'; font-size: 0.8rem; text-transform: uppercase; }
+        td { padding: 15px; border-bottom: 1px solid #eee; }
+        tr:hover { background-color: #f9fff9; }
 
         /* ALERT CARDS */
         .alert-card {
             padding: 15px;
-            border-left: 5px solid var(--status-red);
-            background: #fff5f5;
-            margin-bottom: 15px;
             border-radius: 4px;
+            margin-bottom: 15px;
+            background: white;
+            border: 1px solid #eee;
+            border-left-width: 6px;
         }
     </style>
 </head>
@@ -231,25 +220,26 @@
 
     <aside class="sidebar">
         <div class="sidebar-header">
+            <img src="assets/logo.jpg" alt="MDK Logo" onerror="this.style.display='none'">
             <h2>AMMDK</h2>
-            <p style="font-size: 0.7rem; opacity: 0.8;">ASOCIACIÓN MEXICANA MDK</p>
+            <p style="font-size: 0.6rem; color: #666; font-weight: bold;">ASOCIACIÓN MEXICANA MDK</p>
         </div>
         <nav class="sidebar-nav">
-            <button class="nav-item active" onclick="showView('dashboard')">Panel General</button>
-            <button class="nav-item" onclick="showView('areas')">Áreas de Competencia</button>
-            <button class="nav-item" onclick="showView('graficas')">Listado de Gráficas</button>
-            <button class="nav-item" onclick="showView('alertas')">Validación y Conflictos</button>
+            <button class="nav-item active" onclick="showView('dashboard')">RESUMEN GENERAL</button>
+            <button class="nav-item" onclick="showView('areas')">ÁREAS DE TORNEO</button>
+            <button class="nav-item" onclick="showView('graficas')">LISTADO DE GRÁFICAS</button>
+            <button class="nav-item" onclick="showView('alertas')">CONFLICTOS Y ALERTAS</button>
         </nav>
-        <div style="padding: 20px; font-size: 0.7rem; opacity: 0.5; text-align: center;">
-            © 2026 AMMDK - Gestión Operativa
+        <div style="padding: 20px; font-size: 0.65rem; color: #555; text-align: center; border-top: 1px solid #333;">
+            SISTEMA DE GRAFICACIÓN V1.0
         </div>
     </aside>
 
     <div class="main-container">
         <header class="top-bar">
-            <h1 id="page-title">Panel General</h1>
+            <h1 id="page-title">Resumen General</h1>
             <div class="search-box">
-                <input type="text" placeholder="Buscar por nombre de alumno..." onkeyup="searchAlumno(this.value)">
+                <input type="text" placeholder="🔍 Buscar alumno por nombre..." onkeyup="searchAlumno(this.value)">
             </div>
         </header>
 
@@ -259,7 +249,7 @@
 
     <div id="overlay" class="overlay" onclick="closeDrawer()"></div>
     <div id="drawer" class="drawer">
-        <button class="close-btn" onclick="closeDrawer()">&times;</button>
+        <button onclick="closeDrawer()" style="float:right; border:none; background:none; font-size:2rem; cursor:pointer; color:var(--mdk-green)">&times;</button>
         <div id="drawer-content"></div>
     </div>
 
@@ -271,27 +261,14 @@
     <script src="assets/js/alumnos.js"></script>
 
     <script>
-        // Inicialización rápida si no se cargan archivos externos de inmediato
         window.onload = () => {
-            if (typeof App !== 'undefined') {
-                App.init();
-            } else {
-                console.error("Los módulos JS no se encontraron. Asegúrate de que la carpeta assets/js/ tenga los archivos.");
-                // Fallback manual para demo si los archivos no existen aún
-                document.getElementById('main-content').innerHTML = `
-                    <div style="text-align:center; padding-top: 50px;">
-                        <h3>Bienvenido al Graficador AMMDK</h3>
-                        <p>Por favor, asegúrate de crear los archivos JS en la carpeta assets/js para activar la funcionalidad.</p>
-                    </div>
-                `;
-            }
+            if (typeof App !== 'undefined') App.init();
         };
 
         function showView(view) {
-            // Lógica para cambiar vista
             const btns = document.querySelectorAll('.nav-item');
             btns.forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
+            if(event) event.target.classList.add('active');
             
             if (typeof App !== 'undefined') App.renderView(view);
         }
