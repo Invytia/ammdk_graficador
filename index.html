@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Graficador AMMDK | Sistema de Gestión</title>
+    <title>Graficador AMMDK | Gestión de Torneos</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         /* PALETA MDK OFICIAL (Basada en ammdk.org) */
@@ -32,7 +32,7 @@
             overflow: hidden;
         }
 
-        /* SIDEBAR ESTILO MDK */
+        /* SIDEBAR */
         .sidebar {
             width: 280px;
             background-color: var(--mdk-black);
@@ -45,14 +45,16 @@
         .sidebar-header {
             padding: 30px 20px;
             text-align: center;
-            background-color: var(--mdk-white); /* Fondo blanco para el logo */
+            background-color: var(--mdk-white); 
             border-bottom: 5px solid var(--mdk-green);
         }
 
+        /* Contenedor del Logo */
         .sidebar-header img {
-            max-width: 120px;
+            max-width: 160px; /* Ajustado para mejor visibilidad */
             height: auto;
-            margin-bottom: 10px;
+            display: block;
+            margin: 0 auto 10px auto;
         }
 
         .sidebar-header h2 {
@@ -60,6 +62,15 @@
             font-size: 1.1rem;
             color: var(--mdk-green);
             font-weight: 700;
+            margin-top: 5px;
+        }
+
+        .sidebar-header p {
+            font-size: 0.6rem;
+            color: #666;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
         .sidebar-nav {
@@ -78,9 +89,11 @@
             border: none;
             background: transparent;
             text-align: left;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 600;
             cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             transition: all 0.2s ease;
         }
 
@@ -91,7 +104,7 @@
 
         .nav-item.active {
             background-color: var(--mdk-green);
-            color: var(--mdk-yellow); /* Texto amarillo sobre verde */
+            color: var(--mdk-yellow); 
         }
 
         /* MAIN CONTENT */
@@ -124,11 +137,12 @@
             border-radius: 4px;
             width: 300px;
             outline: none;
+            font-family: 'Open Sans', sans-serif;
         }
 
         .content-padding { padding: 30px 40px; }
 
-        /* KPI CARDS (Verde con acento amarillo) */
+        /* CARDS */
         .kpi-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -142,7 +156,6 @@
             border-radius: 2px;
             border-top: 5px solid var(--mdk-green);
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            text-align: left;
         }
 
         .kpi-card h3 { font-size: 0.75rem; text-transform: uppercase; color: #666; }
@@ -164,7 +177,7 @@
             border-left: 8px solid var(--mdk-gray);
         }
 
-        .area-card:hover { border-color: var(--mdk-green); background-color: #fafafa; }
+        .area-card:hover { border-color: var(--mdk-green); background-color: #fcfcfc; }
         
         .area-card.status-verde { border-left-color: var(--status-ok); }
         .area-card.status-amarillo { border-left-color: var(--status-warn); }
@@ -172,7 +185,7 @@
 
         .area-card h4 { color: var(--mdk-green); margin-bottom: 5px; font-family: 'Montserrat'; }
 
-        /* DRAWER & OVERLAY */
+        /* DRAWER */
         .drawer {
             position: fixed;
             right: -450px;
@@ -192,27 +205,26 @@
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0, 104, 55, 0.3); /* Verde MDK con transparencia */
+            background: rgba(0, 104, 55, 0.2);
             backdrop-filter: blur(2px);
             z-index: 90;
         }
 
         .overlay.active { display: block; }
 
-        /* TABLAS ESTILO PROFESIONAL */
-        table { width: 100%; border-collapse: collapse; background: white; }
-        th { background: var(--mdk-green); color: var(--mdk-yellow); padding: 15px; text-align: left; font-family: 'Montserrat'; font-size: 0.8rem; text-transform: uppercase; }
-        td { padding: 15px; border-bottom: 1px solid #eee; }
+        /* TABLAS */
+        table { width: 100%; border-collapse: collapse; background: white; margin-top: 10px; }
+        th { background: var(--mdk-green); color: var(--mdk-yellow); padding: 15px; text-align: left; font-family: 'Montserrat'; font-size: 0.75rem; text-transform: uppercase; }
+        td { padding: 15px; border-bottom: 1px solid #eee; font-size: 0.9rem; }
         tr:hover { background-color: #f9fff9; }
 
-        /* ALERT CARDS */
         .alert-card {
             padding: 15px;
             border-radius: 4px;
             margin-bottom: 15px;
             background: white;
             border: 1px solid #eee;
-            border-left-width: 6px;
+            border-left: 6px solid var(--status-danger);
         }
     </style>
 </head>
@@ -220,18 +232,20 @@
 
     <aside class="sidebar">
         <div class="sidebar-header">
-            <img src="assets/logo.jpg" alt="MDK Logo" onerror="this.style.display='none'">
+            <img src="assets/logo.jpg" alt="Logo AMMDK">
             <h2>AMMDK</h2>
-            <p style="font-size: 0.6rem; color: #666; font-weight: bold;">ASOCIACIÓN MEXICANA MDK</p>
+            <p>Asociación Mexicana MDK</p>
         </div>
+        
         <nav class="sidebar-nav">
-            <button class="nav-item active" onclick="showView('dashboard')">RESUMEN GENERAL</button>
-            <button class="nav-item" onclick="showView('areas')">ÁREAS DE TORNEO</button>
-            <button class="nav-item" onclick="showView('graficas')">LISTADO DE GRÁFICAS</button>
-            <button class="nav-item" onclick="showView('alertas')">CONFLICTOS Y ALERTAS</button>
+            <button class="nav-item active" onclick="showView('dashboard')">Resumen General</button>
+            <button class="nav-item" onclick="showView('areas')">Áreas de Torneo</button>
+            <button class="nav-item" onclick="showView('graficas')">Listado de Gráficas</button>
+            <button class="nav-item" onclick="showView('alertas')">Conflictos y Alertas</button>
         </nav>
-        <div style="padding: 20px; font-size: 0.65rem; color: #555; text-align: center; border-top: 1px solid #333;">
-            SISTEMA DE GRAFICACIÓN V1.0
+        
+        <div style="padding: 20px; font-size: 0.65rem; color: #555; text-align: center; border-top: 1px solid #333; background: #000;">
+            GRAFICADOR AMMDK V1.0
         </div>
     </aside>
 
@@ -239,7 +253,7 @@
         <header class="top-bar">
             <h1 id="page-title">Resumen General</h1>
             <div class="search-box">
-                <input type="text" placeholder="🔍 Buscar alumno por nombre..." onkeyup="searchAlumno(this.value)">
+                <input type="text" placeholder="Buscar alumno..." onkeyup="searchAlumno(this.value)">
             </div>
         </header>
 
@@ -250,7 +264,7 @@
     <div id="overlay" class="overlay" onclick="closeDrawer()"></div>
     <div id="drawer" class="drawer">
         <button onclick="closeDrawer()" style="float:right; border:none; background:none; font-size:2rem; cursor:pointer; color:var(--mdk-green)">&times;</button>
-        <div id="drawer-content"></div>
+        <div id="drawer-content" style="margin-top: 40px;"></div>
     </div>
 
     <script src="assets/js/mockData.js"></script>
@@ -261,16 +275,24 @@
     <script src="assets/js/alumnos.js"></script>
 
     <script>
+        // Iniciar App al cargar
         window.onload = () => {
-            if (typeof App !== 'undefined') App.init();
+            if (typeof App !== 'undefined') {
+                App.init();
+            }
         };
 
         function showView(view) {
+            // Manejo de estado activo en botones
             const btns = document.querySelectorAll('.nav-item');
             btns.forEach(b => b.classList.remove('active'));
-            if(event) event.target.classList.add('active');
+            if(event && event.target) {
+                event.target.classList.add('active');
+            }
             
-            if (typeof App !== 'undefined') App.renderView(view);
+            if (typeof App !== 'undefined') {
+                App.renderView(view);
+            }
         }
 
         function closeDrawer() {
@@ -279,7 +301,9 @@
         }
 
         function searchAlumno(val) {
-            if (typeof Alumnos !== 'undefined') Alumnos.buscar(val);
+            if (typeof Alumnos !== 'undefined') {
+                Alumnos.buscar(val);
+            }
         }
     </script>
 </body>
