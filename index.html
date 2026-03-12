@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Graficador AMMDK | Gestión de Torneos</title>
+    <title>Graficador AMMDK | Panel Operativo</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        /* PALETA MDK OFICIAL (Basada en ammdk.org) */
+        /* PALETA MDK OFICIAL */
         :root {
-            --mdk-green: #006837;       /* Verde institucional MDK */
-            --mdk-green-light: #009245;
-            --mdk-yellow: #f9ed32;      /* Amarillo brillante MDK */
+            --mdk-green: #006837;
+            --mdk-yellow: #f9ed32;
             --mdk-black: #1a1a1a;
             --mdk-white: #ffffff;
             --mdk-gray: #f2f2f2;
@@ -49,9 +48,8 @@
             border-bottom: 5px solid var(--mdk-green);
         }
 
-        /* Contenedor del Logo */
         .sidebar-header img {
-            max-width: 160px; /* Ajustado para mejor visibilidad */
+            max-width: 160px;
             height: auto;
             display: block;
             margin: 0 auto 10px auto;
@@ -73,10 +71,7 @@
             text-transform: uppercase;
         }
 
-        .sidebar-nav {
-            flex: 1;
-            padding: 20px 10px;
-        }
+        .sidebar-nav { flex: 1; padding: 20px 10px; }
 
         .nav-item {
             display: block;
@@ -97,23 +92,11 @@
             transition: all 0.2s ease;
         }
 
-        .nav-item:hover {
-            color: var(--mdk-white);
-            background-color: rgba(255,255,255,0.05);
-        }
-
-        .nav-item.active {
-            background-color: var(--mdk-green);
-            color: var(--mdk-yellow); 
-        }
+        .nav-item:hover { color: var(--mdk-white); background-color: rgba(255,255,255,0.05); }
+        .nav-item.active { background-color: var(--mdk-green); color: var(--mdk-yellow); }
 
         /* MAIN CONTENT */
-        .main-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-        }
+        .main-container { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
 
         header.top-bar {
             padding: 15px 40px;
@@ -142,7 +125,7 @@
 
         .content-padding { padding: 30px 40px; }
 
-        /* CARDS */
+        /* KPI CARDS */
         .kpi-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -161,29 +144,58 @@
         .kpi-card h3 { font-size: 0.75rem; text-transform: uppercase; color: #666; }
         .kpi-card .value { font-size: 2.2rem; font-weight: 700; color: var(--mdk-green); margin-top: 5px; }
 
-        /* AREAS GRID */
-        .areas-grid {
+        /* MAPA ESPACIAL DE ÁREAS (TATAMIS) */
+        .arena-layout {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
+            gap: 30px;
+            padding: 40px;
+            background: #e2e8f0; 
+            border-radius: 8px;
+            border: 2px solid #cbd5e1;
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.05);
         }
 
-        .area-card {
+        .tatami {
+            aspect-ratio: 1; 
             background: var(--mdk-white);
-            border: 1px solid #ddd;
-            padding: 20px;
+            border: 6px solid;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
             cursor: pointer;
-            transition: all 0.2s ease;
-            border-left: 8px solid var(--mdk-gray);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
-        .area-card:hover { border-color: var(--mdk-green); background-color: #fcfcfc; }
-        
-        .area-card.status-verde { border-left-color: var(--status-ok); }
-        .area-card.status-amarillo { border-left-color: var(--status-warn); }
-        .area-card.status-rojo { border-left-color: var(--status-danger); }
+        .tatami:hover {
+            transform: scale(1.05);
+            z-index: 2;
+            box-shadow: 0 10px 20px rgba(0,104,55,0.2); 
+        }
 
-        .area-card h4 { color: var(--mdk-green); margin-bottom: 5px; font-family: 'Montserrat'; }
+        .tatami::after {
+            content: '';
+            position: absolute;
+            width: 70%;
+            height: 70%;
+            border: 2px dashed rgba(0,0,0,0.1);
+            pointer-events: none;
+        }
+
+        .tatami h4 { font-size: 1.5rem; color: var(--mdk-black); font-family: 'Montserrat', sans-serif; }
+        .tatami .sbn { font-size: 0.8rem; color: #666; font-weight: bold; margin: 5px 0; }
+        .tatami .stats { font-size: 0.9rem; background: var(--mdk-black); color: white; padding: 4px 10px; border-radius: 12px; margin-top: 10px; z-index: 1;}
+
+        .tatami.status-verde { border-color: var(--status-ok); }
+        .tatami.status-amarillo { border-color: var(--status-warn); }
+        .tatami.status-rojo { border-color: var(--status-danger); }
+
+        @media (max-width: 1024px) { .arena-layout { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 600px) { .arena-layout { grid-template-columns: 1fr; } }
 
         /* DRAWER */
         .drawer {
@@ -197,6 +209,7 @@
             transition: 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
             z-index: 100;
             padding: 40px;
+            overflow-y: auto;
         }
 
         .drawer.open { right: 0; }
@@ -212,7 +225,7 @@
 
         .overlay.active { display: block; }
 
-        /* TABLAS */
+        /* TABLAS Y ALERTAS */
         table { width: 100%; border-collapse: collapse; background: white; margin-top: 10px; }
         th { background: var(--mdk-green); color: var(--mdk-yellow); padding: 15px; text-align: left; font-family: 'Montserrat'; font-size: 0.75rem; text-transform: uppercase; }
         td { padding: 15px; border-bottom: 1px solid #eee; font-size: 0.9rem; }
@@ -239,13 +252,13 @@
         
         <nav class="sidebar-nav">
             <button class="nav-item active" onclick="showView('dashboard')">Resumen General</button>
-            <button class="nav-item" onclick="showView('areas')">Áreas de Torneo</button>
+            <button class="nav-item" onclick="showView('areas')">Mapa de Áreas</button>
             <button class="nav-item" onclick="showView('graficas')">Listado de Gráficas</button>
             <button class="nav-item" onclick="showView('alertas')">Conflictos y Alertas</button>
         </nav>
         
         <div style="padding: 20px; font-size: 0.65rem; color: #555; text-align: center; border-top: 1px solid #333; background: #000;">
-            GRAFICADOR AMMDK V1.0
+            GRAFICADOR AMMDK V2.0
         </div>
     </aside>
 
@@ -267,7 +280,14 @@
         <div id="drawer-content" style="margin-top: 40px;"></div>
     </div>
 
+    <script>
+        window.APP_CONFIG = {
+            WEB_APP_URL: "https://script.google.com/macros/s/AKfycbz2Lz60pxRXlHqFk-E3Z8nJIfl1K5c2IkQaUyWZslQgB0YMrZ6g0B60tJOHTPzfC3_w/exec",
+        };
+    </script>
+
     <script src="assets/js/mockData.js"></script>
+    <script src="assets/js/api.js"></script>
     <script src="assets/js/app.js"></script>
     <script src="assets/js/areas.js"></script>
     <script src="assets/js/graficas.js"></script>
@@ -275,24 +295,17 @@
     <script src="assets/js/alumnos.js"></script>
 
     <script>
-        // Iniciar App al cargar
-        window.onload = () => {
+        window.onload = async () => {
             if (typeof App !== 'undefined') {
-                App.init();
+                await App.init(); 
             }
         };
 
         function showView(view) {
-            // Manejo de estado activo en botones
             const btns = document.querySelectorAll('.nav-item');
             btns.forEach(b => b.classList.remove('active'));
-            if(event && event.target) {
-                event.target.classList.add('active');
-            }
-            
-            if (typeof App !== 'undefined') {
-                App.renderView(view);
-            }
+            if(event && event.target) event.target.classList.add('active');
+            if (typeof App !== 'undefined') App.renderView(view);
         }
 
         function closeDrawer() {
@@ -301,9 +314,7 @@
         }
 
         function searchAlumno(val) {
-            if (typeof Alumnos !== 'undefined') {
-                Alumnos.buscar(val);
-            }
+            if (typeof Alumnos !== 'undefined') Alumnos.buscar(val);
         }
     </script>
 </body>
