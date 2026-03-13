@@ -1,18 +1,32 @@
 let graficaActivaParaJuez = null;
 
+// ==========================================
+// VENTANA DEL JUEZ
+// ==========================================
 function abrirModalJuez(idGrafica) {
-    if(!window.datosGlobalesGraficas) return alert("Aún no cargan los datos. Espera un segundo.");
+    if (!window.datosGlobalesGraficas) {
+        alert("Aún no cargan los datos. Espera un segundo.");
+        return;
+    }
     
     const grafica = window.datosGlobalesGraficas.find(g => String(g.id) === String(idGrafica));
-    if(!grafica) return alert("Error al cargar la gráfica");
+    if (!grafica) {
+        alert("Error al cargar la gráfica");
+        return;
+    }
 
     graficaActivaParaJuez = grafica.id;
     document.getElementById('juez-grafica-info').innerText = `Categoría: ${grafica.categoria} | Cinta: ${grafica.cinta}`;
 
     let opcionesHTML = `<option value="">-- Selecciona un competidor --</option>`;
     
-    let listaC = grafica.competidores_data || grafica.competidores;
-    if(listaC && listaC.length > 0) {
+    // Soporte para ambos formatos de datos (por si acaso)
+    let listaC = grafica.competidores_data || [];
+    if (listaC.length === 0 && grafica.competidores) {
+        listaC = grafica.competidores.map(nombre => ({ id: nombre, nombre: nombre }));
+    }
+
+    if (listaC && listaC.length > 0) {
         listaC.forEach(comp => {
             const elId = comp.id || comp;
             const elNom = comp.nombre || comp;
@@ -21,7 +35,8 @@ function abrirModalJuez(idGrafica) {
     }
 
     ['oro', 'plata', 'bronce1', 'bronce2'].forEach(medalla => {
-        document.getElementById(`select-${medalla}`).innerHTML = opcionesHTML;
+        const select = document.getElementById(`select-${medalla}`);
+        if(select) select.innerHTML = opcionesHTML;
     });
 
     document.getElementById('modal-juez').style.display = 'flex';
@@ -32,10 +47,16 @@ function cerrarModalJuez() {
     graficaActivaParaJuez = null;
 }
 
+// ==========================================
+// GUARDAR MEDALLAS EN GOOGLE SHEETS
+// ==========================================
 async function guardarResultados() {
-    const btn = event.target;
-    btn.innerText = "Guardando...";
-    btn.disabled = true;
+    // Tomamos el botón directamente
+    const btn = document.querySelector('.btn-guardar-juez');
+    if(btn) {
+        btn.innerText = "Guardando en servidor...";
+        btn.disabled = true;
+    }
 
     const resultados = {
         oro: document.getElementById('select-oro').value,
@@ -45,47 +66,70 @@ async function guardarResultados() {
     };
 
     try {
-        // CORRECCIÓN AQUÍ: Solo "API" en lugar de "window.API"
-        const respuesta = await API.registrarResultado(graficaActivaParaJuez, resultados);
-        if(respuesta && respuesta.ok) {
+        console.log("Intentando guardar medallas. ID:", graficaActivaParaJuez);
+        console.log("Resultados:", resultados);
+
+        // Llamamos a la API
+        const respuesta = await window.API.registrarResultado(graficaActivaParaJuez, resultados);
+        
+        console.log("El servidor respondió:", respuesta);
+        
+        if (respuesta && respuesta.ok) {
             alert("¡Resultados guardados! Puntuación actualizada.");
             cerrarModalJuez();
-            if(typeof Graficas !== 'undefined') Graficas.render(document.getElementById('main-content'));
+            
+            // TRUCO INFALIBLE: Recargar la página entera para forzar a que tu app.js 
+            // descargue el estado "FINALIZADA" y el nuevo ranking desde cero.
+            window.location.reload(); 
         } else {
-            alert("Error al guardar: " + (respuesta.error || "Desconocido"));
+            alert("Error al guardar: " + (respuesta.error || "El servidor rechazó la solicitud"));
         }
     } catch(e) {
-        alert("Error de red. Intenta de nuevo.");
+        console.error("Falló la conexión de red:", e);
+        alert("Error de red. Abre la consola de tu navegador para ver los detalles.");
     } finally {
-        btn.innerText = "Guardar y Actualizar Puntos";
-        btn.disabled = false;
+        if(btn) {
+            btn.innerText = "Guardar y Actualizar Puntos";
+            btn.disabled = false;
+        }
     }
 }
 
+// ==========================================
+// VISTA DE RANKING
+// ==========================================
 async function mostrarRanking(event) {
-    // Apaga los otros botones del menú y enciende este
-    if(event) {
+    // Iluminar el botón correcto en el menú
+    if(event && event.target) {
         document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
         event.target.classList.add('active');
     }
 
-    document.getElementById('vista-ranking').style.display = 'block';
+    // Ocultar la pantalla normal y encender la del ranking
+    const mc = document.getElementById('main-content');
+    if (mc) mc.style.display = 'none';
+    
+    const vr = document.getElementById('vista-ranking');
+    if (vr) vr.style.display = 'block';
     
     const tbody = document.getElementById('tabla-ranking-body');
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 20px;">Cargando tabla de posiciones... 🏆</td></tr>`;
+    if (!tbody) return;
+    
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 20px;">Cargando posiciones desde Google... ⏳</td></tr>`;
 
     try {
-        // CORRECCIÓN AQUÍ: Solo "API" en lugar de "window.API"
-        const datosRanking = await API.getRanking();
+        console.log("Pidiendo los datos del Ranking...");
+        const datosRanking = await window.API.getRanking();
+        console.log("Ranking recibido:", datosRanking);
         
-        if(!datosRanking || datosRanking.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 20px; color:#666;">Aún no hay puntos registrados. ¡Que comiencen los combates!</td></tr>`;
+        if (!datosRanking || datosRanking.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 30px; color:#666;">Aún no hay puntos registrados. ¡Asigna medallas en el Listado de Gráficas!</td></tr>`;
             return;
         }
 
         tbody.innerHTML = "";
         datosRanking.forEach((escuela, index) => {
-            let medallaPosicion = `<strong style="font-size: 1.2rem;">${index + 1}</strong>`;
+            let medallaPosicion = `<strong style="font-size: 1.2rem; color: #7f8c8d;">${index + 1}</strong>`;
             if(index === 0) medallaPosicion = "<span style='font-size: 1.5rem;'>🥇</span>";
             if(index === 1) medallaPosicion = "<span style='font-size: 1.5rem;'>🥈</span>";
             if(index === 2) medallaPosicion = "<span style='font-size: 1.5rem;'>🥉</span>";
@@ -93,21 +137,28 @@ async function mostrarRanking(event) {
             tbody.innerHTML += `
                 <tr style="border-bottom: 1px solid #eee;">
                     <td style="padding: 15px; text-align:center;">${medallaPosicion}</td>
-                    <td style="padding: 15px; font-weight: bold; color: var(--mdk-black);">${escuela.escuela}</td>
-                    <td style="padding: 15px; text-align: center; color: #d4af37; font-weight: bold;">${escuela.oros || 0}</td>
-                    <td style="padding: 15px; text-align: center; color: #95a5a6; font-weight: bold;">${escuela.platas || 0}</td>
-                    <td style="padding: 15px; text-align: center; color: #cd7f32; font-weight: bold;">${escuela.bronces || 0}</td>
-                    <td style="padding: 15px; text-align: right; font-weight: bold; color: var(--mdk-green); font-size: 1.2rem;">${escuela.puntos_totales} pts</td>
+                    <td style="padding: 15px; font-weight: bold; color: var(--mdk-black);">${escuela.escuela || 'Independiente'}</td>
+                    <td style="padding: 15px; text-align: center; color: #d4af37; font-weight: bold; font-size: 1.1rem;">${escuela.oros || 0}</td>
+                    <td style="padding: 15px; text-align: center; color: #95a5a6; font-weight: bold; font-size: 1.1rem;">${escuela.platas || 0}</td>
+                    <td style="padding: 15px; text-align: center; color: #cd7f32; font-weight: bold; font-size: 1.1rem;">${escuela.bronces || 0}</td>
+                    <td style="padding: 15px; text-align: right; font-weight: bold; color: var(--mdk-green); font-size: 1.3rem;">${escuela.puntos_totales} pts</td>
                 </tr>
             `;
         });
     } catch(e) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 20px; color:red;">Error al cargar el ranking.</td></tr>`;
+        console.error("Error al pintar la tabla de ranking:", e);
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 20px; color:red;">Fallo al conectar con Google Sheets.</td></tr>`;
     }
 }
 
 function cerrarRanking() {
-    document.getElementById('vista-ranking').style.display = 'none';
-    // Simula un clic en el "Resumen General" para regresar tu pantalla a la normalidad
-    document.querySelector('.nav-item').click(); 
+    const vr = document.getElementById('vista-ranking');
+    if (vr) vr.style.display = 'none';
+    
+    const mc = document.getElementById('main-content');
+    if (mc) mc.style.display = 'block';
+    
+    // Simular clic en el Resumen General para resetear visualmente
+    const primerBoton = document.querySelector('.nav-item');
+    if (primerBoton) primerBoton.click();
 }
