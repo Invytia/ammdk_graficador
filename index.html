@@ -241,7 +241,7 @@
         }
 
         /* ========================================== */
-        /* NUEVOS ESTILOS: MODAL DE JUECES            */
+        /* ESTILOS: RANKING Y JUECES                  */
         /* ========================================== */
         .modal-juez-container {
             display: none;
@@ -295,7 +295,7 @@
         </nav>
         
         <div style="padding: 20px; font-size: 0.65rem; color: #555; text-align: center; border-top: 1px solid #333; background: #000;">
-            GRAFICADOR AMMDK POR SBN SERGIO RODRIGUEZ
+            GRAFICADOR AMMDK V2.0
         </div>
     </aside>
 
@@ -312,7 +312,7 @@
 
         <div id="vista-ranking" class="content-padding" style="display: none;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2 style="color: var(--mdk-green); font-family: 'Montserrat';">Campeonato por Escuelas</h2>
+                <h2 style="color: var(--mdk-green); font-family: 'Montserrat';">🏆 Campeonato por Escuelas</h2>
             </div>
             
             <div style="overflow-x: auto; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
@@ -341,10 +341,9 @@
         <div id="drawer-content" style="margin-top: 40px;"></div>
     </div>
 
-
     <div id="modal-juez" class="modal-juez-container">
         <div class="modal-juez-content">
-            <h2 style="font-family: 'Montserrat', sans-serif; color: var(--mdk-green); margin-bottom: 5px;">Registrar Ganadores</h2>
+            <h2 style="font-family: 'Montserrat', sans-serif; color: var(--mdk-green); margin-bottom: 5px;">🏆 Registrar Ganadores</h2>
             <p id="juez-grafica-info" style="font-size: 0.85rem; color: #666; margin-bottom: 20px; font-weight: bold; text-transform: uppercase;"></p>
             
             <div style="text-align: left;">
@@ -368,7 +367,7 @@
 
     <script>
         window.APP_CONFIG = {
-            WEB_APP_URL: "https://script.google.com/macros/s/AKfycbz2Lz60pxRXlHqFk-E3Z8nJIfl1K5c2IkQaUyWZslQgB0YMrZ6g0B60tJOHTPzfC3_w/exec",
+            WEB_APP_URL: "https://script.google.com/macros/s/AKfycbzF0IPxmI0Sw-MBNsALUxOCWqQLcsgpVDKn_LHUcmOhPHRxfhu_G6RR4Y3xRbEFrzaXdA/exec",
         };
     </script>
 
@@ -379,7 +378,6 @@
     <script src="assets/js/graficas.js"></script>
     <script src="assets/js/validacion.js"></script>
     <script src="assets/js/alumnos.js"></script>
-    
     <script src="assets/js/jueces.js"></script>
 
     <script>
@@ -389,9 +387,7 @@
             }
         };
 
-        // Esta función original tuya ahora también oculta el ranking al cambiar de pestaña
         function showView(view) {
-            // Ocultar ranking si estaba visible, mostrar contenedor principal
             document.getElementById('vista-ranking').style.display = 'none';
             document.getElementById('main-content').style.display = 'block';
 
