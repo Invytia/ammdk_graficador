@@ -21,9 +21,16 @@ const App = {
     },
 
     init: async function() {
-        document.getElementById('main-content').innerHTML = "<h3 style='color:var(--mdk-green);'>Sincronizando con Google Sheets...</h3>";
+        document.getElementById('main-content').innerHTML = "<h3 style='color:var(--mdk-green); text-align:center; padding:40px; font-family:Montserrat;'>Sincronizando con Google Sheets...</h3>";
         await this.loadData();
         this.renderView('dashboard');
+    },
+
+    // NUEVO: Función para recargar los datos silenciosamente sin parpadear la pantalla completa
+    refresh: async function(currentView = 'dashboard') {
+        console.log("Refrescando datos desde el servidor...");
+        await this.loadData();
+        this.renderView(currentView);
     },
 
     loadData: async function() {
@@ -89,20 +96,37 @@ const App = {
             
             <div style="margin-top: 30px; background: white; padding: 25px; border-radius: 4px; border: 1px solid #ddd;">
                 <h3 style="color: var(--mdk-green); margin-bottom: 15px; font-family:'Montserrat'">Acciones Rápidas</h3>
-                <button onclick="App.triggerGenerar()" style="background:var(--mdk-green); color:var(--mdk-yellow); padding: 12px 25px; font-weight: bold; border: none; cursor: pointer; border-radius: 4px; font-family: 'Montserrat'; text-transform:uppercase;">
-                    Generar Gráficas Automáticamente
+                <button onclick="App.triggerGenerar(event)" style="background:var(--mdk-green); color:var(--mdk-yellow); padding: 12px 25px; font-weight: bold; border: none; cursor: pointer; border-radius: 4px; font-family: 'Montserrat'; text-transform:uppercase; transition: 0.3s;">
+                    ⚡ Generar Gráficas Automáticamente
                 </button>
             </div>
         `;
     },
 
-    triggerGenerar: async function() {
-        if(confirm("¿Estás seguro de generar nuevas gráficas? Esto conectará con tu Google Sheets.")){
-            alert("Procesando en el servidor... (Asegúrate de tener el endpoint POST listo en Code.gs)");
-            // Cuando tu backend esté listo, descomentas esto:
-            // await API.generarGraficas();
-            // await this.loadData();
-            // this.renderView('dashboard');
+    // CORREGIDO: Ahora sí se comunica con Google para generar las gráficas
+    triggerGenerar: async function(event) {
+        if(confirm("¿Estás seguro de generar nuevas gráficas? Esto conectará con tu Google Sheets y recalculará todo.")){
+            const btn = event.target;
+            const textoOriginal = btn.innerText;
+            btn.innerText = "⚙️ Procesando en el servidor (Modo Turbo)...";
+            btn.disabled = true;
+            btn.style.backgroundColor = "#7f8c8d";
+
+            try {
+                const respuesta = await API.generarGraficas();
+                if(respuesta && respuesta.ok) {
+                    alert("¡Gráficas generadas y áreas asignadas exitosamente!");
+                    await this.refresh('dashboard'); // Recarga los datos y vuelve a pintar los KPIs
+                } else {
+                    alert("Hubo un error al generar las gráficas.");
+                }
+            } catch(e) {
+                alert("El servidor está procesando demasiados datos en segundo plano. Refresca la página en 1 minuto.");
+            } finally {
+                btn.innerText = textoOriginal;
+                btn.disabled = false;
+                btn.style.backgroundColor = "var(--mdk-green)";
+            }
         }
     }
 };
