@@ -70,7 +70,7 @@ async function guardarResultados() {
         console.log("Resultados:", resultados);
 
         // Llamamos a la API
-        const respuesta = await window.API.registrarResultado(graficaActivaParaJuez, resultados);
+        const respuesta = await API.registrarResultado(graficaActivaParaJuez, resultados);
         
         console.log("El servidor respondió:", respuesta);
         
@@ -78,9 +78,9 @@ async function guardarResultados() {
             alert("¡Resultados guardados! Puntuación actualizada.");
             cerrarModalJuez();
             
-            // TRUCO INFALIBLE: Recargar la página entera para forzar a que tu app.js 
-            // descargue el estado "FINALIZADA" y el nuevo ranking desde cero.
-            window.location.reload(); 
+            // Refresca la vista de gráficas suavemente usando tu motor principal
+            if(typeof App !== 'undefined') App.refresh('graficas');
+            
         } else {
             alert("Error al guardar: " + (respuesta.error || "El servidor rechazó la solicitud"));
         }
@@ -119,7 +119,7 @@ async function mostrarRanking(event) {
 
     try {
         console.log("Pidiendo los datos del Ranking...");
-        const datosRanking = await window.API.getRanking();
+        const datosRanking = await API.getRanking();
         console.log("Ranking recibido:", datosRanking);
         
         if (!datosRanking || datosRanking.length === 0) {
