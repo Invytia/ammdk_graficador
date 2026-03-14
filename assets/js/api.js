@@ -2,21 +2,31 @@
 // CONEXIÓN DIRECTA A GOOGLE APPS SCRIPT
 // ==========================================
 
-// ¡NUEVA URL DEFINITIVA!
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwXH0jAOG__tp9BUhAB8aBmbgErcjLXqYo177L9yAm7hzgvDa5qDl44OgRVBhMbF5XgHQ/exec";
+/**
+ * El API utiliza la URL configurada en el index.html para mayor flexibilidad.
+ * Si por alguna razón falla, usa el respaldo directo.
+ */
+const WEB_APP_URL = (window.APP_CONFIG && window.APP_CONFIG.WEB_APP_URL) 
+    ? window.APP_CONFIG.WEB_APP_URL 
+    : "https://script.google.com/macros/s/AKfycbwXH0jAOG__tp9BUhAB8aBmbgErcjLXqYo177L9yAm7hzgvDa5qDl44OgRVBhMbF5XgHQ/exec";
 
 const API = {
     // ---------------------------------------------------
-    // MOTOR DE PETICIONES
+    // MOTOR DE PETICIONES (NÚCLEO)
     // ---------------------------------------------------
     async peticionGET(accion, parametrosExtra = "") {
         try {
-            const urlCompleta = `${WEB_APP_URL}?action=${accion}${parametrosExtra}`;
+            // Agregamos un buster de caché para que no de datos viejos
+            const cacheBuster = `&_cb=${new Date().getTime()}`;
+            const urlCompleta = `${WEB_APP_URL}?action=${accion}${parametrosExtra}${cacheBuster}`;
+            
             const respuesta = await fetch(urlCompleta);
-            if (!respuesta.ok) throw new Error('Falló la red');
-            return await respuesta.json();
+            if (!respuesta.ok) throw new Error('Error en la respuesta de red');
+            
+            const datos = await respuesta.json();
+            return datos;
         } catch (error) {
-            console.error(`[API] Error descargando (${accion}):`, error);
+            console.error(`[API ERROR] Falló la descarga de (${accion}):`, error);
             return null;
         }
     },
@@ -25,13 +35,13 @@ const API = {
         try {
             const respuesta = await fetch(WEB_APP_URL, {
                 method: 'POST',
-                // Importante para Google Sheets: text/plain para evitar bloqueos
+                // Usamos text/plain para evitar problemas de CORS con Google Apps Script
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify(datos)
             });
             return await respuesta.json();
         } catch (error) {
-            console.error(`[API] Error enviando datos:`, error);
+            console.error(`[API ERROR] No se pudo enviar la información:`, error);
             return { ok: false, error: error.message };
         }
     },
@@ -56,6 +66,7 @@ const API = {
     },
     
     getRanking: async function() { 
+        // Esta función alimenta la tabla de Campeonato por Escuelas
         return await this.peticionGET('ranking'); 
     },
     
@@ -81,5 +92,5 @@ const API = {
     }
 };
 
-// Exponemos la API globalmente
+// Exponemos la API globalmente para que sea accesible desde otros scripts
 window.API = API;
