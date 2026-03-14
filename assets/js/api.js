@@ -2,8 +2,8 @@
 // CONEXIÓN DIRECTA A GOOGLE APPS SCRIPT
 // ==========================================
 
-// Aquí tatuamos tu nueva URL para que nada pueda fallar
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzF0IPxmI0Sw-MBNsALUxOCWqQLcsgpVDKn_LHUcmOhPHRxfhu_G6RR4Y3xRbEFrzaXdA/exec";
+// ¡NUEVA URL DEFINITIVA!
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwXH0jAOG__tp9BUhAB8aBmbgErcjLXqYo177L9yAm7hzgvDa5qDl44OgRVBhMbF5XgHQ/exec";
 
 const API = {
     // ---------------------------------------------------
@@ -25,7 +25,7 @@ const API = {
         try {
             const respuesta = await fetch(WEB_APP_URL, {
                 method: 'POST',
-                // Google Sheets recibe mejor las peticiones en texto plano para evitar bloqueos CORS
+                // Importante para Google Sheets: text/plain para evitar bloqueos
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify(datos)
             });
@@ -56,7 +56,6 @@ const API = {
     },
     
     getRanking: async function() { 
-        // Esta es la función clave que pedirá la tabla de posiciones
         return await this.peticionGET('ranking'); 
     },
     
@@ -74,7 +73,6 @@ const API = {
     },
 
     registrarResultado: async function(id_grafica, resultados) {
-        // Esta función envía las medallas al servidor
         return await this.peticionPOST({
             action: 'registrar_resultado',
             id_grafica: id_grafica,
@@ -83,5 +81,5 @@ const API = {
     }
 };
 
-// Exponemos la API globalmente para que app.js y jueces.js puedan usarla
+// Exponemos la API globalmente
 window.API = API;
