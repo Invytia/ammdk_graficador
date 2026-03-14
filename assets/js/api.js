@@ -1,54 +1,87 @@
+// ==========================================
+// CONEXIÓN DIRECTA A GOOGLE APPS SCRIPT
+// ==========================================
+
+// Aquí tatuamos tu nueva URL para que nada pueda fallar
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzF0IPxmI0Sw-MBNsALUxOCWqQLcsgpVDKn_LHUcmOhPHRxfhu_G6RR4Y3xRbEFrzaXdA/exec";
+
 const API = {
-    fetchData: async (action, params = "") => {
-        // Truco de ingeniería para evitar el caché: agregar la hora exacta en milisegundos
-        const timeStamp = new Date().getTime();
-        const url = `${window.APP_CONFIG.WEB_APP_URL}?action=${action}${params}&t=${timeStamp}`;
-        
+    // ---------------------------------------------------
+    // MOTOR DE PETICIONES
+    // ---------------------------------------------------
+    async peticionGET(accion, parametrosExtra = "") {
         try {
-            const response = await fetch(url, { 
-                method: "GET", 
-                redirect: "follow" 
-            });
-            
-            if (!response.ok) throw new Error("Error de red al conectar con Google");
-            
-            return await response.json();
+            const urlCompleta = `${WEB_APP_URL}?action=${accion}${parametrosExtra}`;
+            const respuesta = await fetch(urlCompleta);
+            if (!respuesta.ok) throw new Error('Falló la red');
+            return await respuesta.json();
         } catch (error) {
-            console.warn(`[API] Falló la conexión al endpoint: ${action}.`, error);
-            return null; 
+            console.error(`[API] Error descargando (${accion}):`, error);
+            return null;
         }
     },
 
-    postData: async (action, payload) => {
+    async peticionPOST(datos) {
         try {
-            const response = await fetch(`${window.APP_CONFIG.WEB_APP_URL}?action=${action}`, {
-                method: "POST",
-                redirect: "follow",
-                // CRÍTICO para saltar la seguridad CORS de Google
-                headers: { "Content-Type": "text/plain;charset=utf-8" }, 
-                body: JSON.stringify(payload)
+            const respuesta = await fetch(WEB_APP_URL, {
+                method: 'POST',
+                // Google Sheets recibe mejor las peticiones en texto plano para evitar bloqueos CORS
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(datos)
             });
-            return await response.json();
+            return await respuesta.json();
         } catch (error) {
-            console.error(`[API POST Error en ${action}]:`, error);
-            throw error;
+            console.error(`[API] Error enviando datos:`, error);
+            return { ok: false, error: error.message };
         }
     },
 
-    // ==========================================
-    // ENDPOINTS DE LECTURA (GET)
-    // ==========================================
-    getResumen: async () => await API.fetchData("resumen"),
-    getAreas: async () => await API.fetchData("areas"),
-    getGraficas: async () => await API.fetchData("graficas"),
-    getValidaciones: async () => await API.fetchData("validaciones"),
-    buscarAlumno: async (q) => await API.fetchData("buscar", `&q=${encodeURIComponent(q)}`),
-    getRanking: async () => await API.fetchData("ranking"), // NUEVO: Obtiene la tabla de posiciones
+    // ---------------------------------------------------
+    // FUNCIONES DE LECTURA (GET)
+    // ---------------------------------------------------
+    getResumen: async function() { 
+        return await this.peticionGET('resumen'); 
+    },
     
-    // ==========================================
-    // ENDPOINTS DE ESCRITURA (POST)
-    // ==========================================
-    generarGraficas: async () => await API.postData("generar", { ejecutar: true }),
-    moverGrafica: async (idGrafica, idArea) => await API.postData("mover", { grafica: idGrafica, nuevaArea: idArea }),
-    registrarResultado: async (idGrafica, resultados) => await API.postData("registrar_resultado", { id_grafica: idGrafica, resultados: resultados }) // NUEVO: Guarda las medallas
+    getAreas: async function() { 
+        return await this.peticionGET('areas'); 
+    },
+    
+    getGraficas: async function() { 
+        return await this.peticionGET('graficas'); 
+    },
+    
+    getValidaciones: async function() { 
+        return await this.peticionGET('validaciones'); 
+    },
+    
+    getRanking: async function() { 
+        // Esta es la función clave que pedirá la tabla de posiciones
+        return await this.peticionGET('ranking'); 
+    },
+    
+    buscarAlumno: async function(q) { 
+        return await this.peticionGET('buscar', `&q=${encodeURIComponent(q)}`); 
+    },
+
+    // ---------------------------------------------------
+    // FUNCIONES DE ESCRITURA (POST)
+    // ---------------------------------------------------
+    generarGraficas: async function() {
+        return await this.peticionPOST({ 
+            action: 'generar' 
+        });
+    },
+
+    registrarResultado: async function(id_grafica, resultados) {
+        // Esta función envía las medallas al servidor
+        return await this.peticionPOST({
+            action: 'registrar_resultado',
+            id_grafica: id_grafica,
+            resultados: resultados
+        });
+    }
 };
+
+// Exponemos la API globalmente para que app.js y jueces.js puedan usarla
+window.API = API;
