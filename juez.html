@@ -6,7 +6,7 @@
     <title>Panel de Juez | AMMDK</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        /* PALETA MDK OFICIAL */
+        /* ESTILOS PROFESIONALES AMMDK */
         :root {
             --mdk-green: #006837;
             --mdk-yellow: #f9ed32;
@@ -17,7 +17,6 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Open Sans', sans-serif; }
-
         body { background-color: var(--mdk-gray); color: var(--mdk-black); padding-bottom: 50px; }
 
         header {
@@ -36,6 +35,7 @@
 
         .container { padding: 20px; max-width: 800px; margin: 0 auto; }
 
+        /* PANTALLA SELECTOR DE ÁREA */
         #pantalla-areas { text-align: center; }
         .area-grid {
             display: grid;
@@ -53,59 +53,53 @@
             color: var(--mdk-green);
             cursor: pointer;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            transition: transform 0.1s;
         }
         .btn-area:active { transform: scale(0.95); background-color: var(--mdk-green); color: var(--mdk-yellow); }
 
+        /* LISTADO DE GRÁFICAS */
         #pantalla-combates { display: none; }
         .btn-volver {
             background: transparent; border: none; color: var(--mdk-green); font-weight: bold; font-size: 1rem;
             margin-bottom: 20px; cursor: pointer; display: flex; align-items: center;
         }
-        .btn-volver::before { content: '←'; margin-right: 5px; font-size: 1.2rem; }
+        .btn-volver::before { content: '← '; }
 
         .tarjeta-grafica {
             background: white; border-radius: 8px; padding: 20px; margin-bottom: 15px;
-            border-left: 6px solid var(--mdk-green);
+            border-left: 8px solid var(--mdk-green);
             box-shadow: 0 4px 10px rgba(0,0,0,0.08);
             display: flex; flex-direction: column; gap: 10px;
         }
         .tarjeta-grafica.poomsae { border-left-color: #2980b9; }
         .tarjeta-grafica.kyorugui { border-left-color: #c0392b; }
 
-        .tg-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        .tg-id { font-weight: bold; color: #666; font-size: 0.8rem; }
-        .badge-mod { padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; color: white; letter-spacing: 0.5px; }
+        .badge-mod { padding: 5px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; color: white; text-transform: uppercase; }
         .bg-poomsae { background-color: #2980b9; }
         .bg-kyorugui { background-color: #c0392b; }
 
-        .tg-body h3 { font-family: 'Montserrat', sans-serif; font-size: 1.1rem; color: var(--mdk-black); }
-        .tg-body p { font-size: 0.9rem; color: #666; margin-top: 5px; }
-        .tg-competidores { margin-top: 15px; background: var(--mdk-gray); padding: 10px; border-radius: 4px; font-weight: 600; font-size: 0.95rem; text-align: center; }
+        .tg-body h3 { font-family: 'Montserrat', sans-serif; font-size: 1.1rem; margin-bottom: 5px; }
+        .tg-competidores { margin-top: 10px; padding: 12px; background: #f8f9fa; border-radius: 4px; font-weight: bold; text-align: center; font-size: 1rem; }
 
         .btn-calificar {
             background-color: var(--mdk-green); color: var(--mdk-yellow); border: none;
-            padding: 18px; border-radius: 4px; font-size: 1.1rem; font-weight: bold;
-            text-transform: uppercase; cursor: pointer; margin-top: 10px; width: 100%;
+            padding: 15px; border-radius: 4px; font-size: 1.1rem; font-weight: bold;
+            text-transform: uppercase; cursor: pointer; width: 100%; margin-top: 10px;
         }
 
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 999; justify-content: center; align-items: center; padding: 20px; }
-        .modal-content { background: white; padding: 25px; border-radius: 8px; width: 100%; max-width: 400px; max-height: 90vh; overflow-y: auto; border-top: 5px solid var(--mdk-green); }
-        .modal-content h2 { font-family: 'Montserrat'; color: var(--mdk-green); text-align: center; margin-bottom: 5px; }
-        .modal-content p.info { text-align: center; font-size: 0.85rem; color: #666; font-weight: bold; margin-bottom: 20px; }
+        /* MODAL TOUCH OPTIMIZED */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 999; justify-content: center; align-items: center; padding: 15px; }
+        .modal-content { background: white; padding: 25px; border-radius: 12px; width: 100%; max-width: 450px; border-top: 8px solid var(--mdk-green); }
         
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.9rem; }
-        .form-group select { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 1rem; background: var(--mdk-gray); outline: none; }
-        .form-group select:focus { border-color: var(--mdk-green); }
+        .form-group select { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 1.1rem; outline: none; background: #fff; }
 
-        .btn-guardar { background-color: var(--mdk-green); color: white; border: none; padding: 18px; border-radius: 6px; font-size: 1.1rem; font-weight: bold; cursor: pointer; width: 100%; text-transform: uppercase; margin-top: 10px; }
-        .btn-cancelar { background: transparent; color: var(--status-danger); border: none; padding: 15px; font-size: 1rem; font-weight: bold; cursor: pointer; width: 100%; margin-top: 5px; text-decoration: underline; }
+        .btn-guardar { background-color: var(--mdk-green); color: white; border: none; padding: 18px; border-radius: 6px; font-size: 1.1rem; font-weight: bold; width: 100%; cursor: pointer; text-transform: uppercase; }
+        .btn-cancelar { background: none; color: var(--status-danger); border: none; padding: 15px; width: 100%; font-weight: bold; cursor: pointer; text-decoration: underline; }
 
         #loader { text-align: center; padding: 50px; display: none; }
         .spinner { border: 4px solid rgba(0,0,0,0.1); width: 40px; height: 40px; border-radius: 50%; border-left-color: var(--mdk-green); animation: spin 1s linear infinite; margin: 0 auto 15px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .mensaje-vacio { text-align: center; padding: 40px 20px; color: #666; font-style: italic; background: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
     </style>
 </head>
 <body>
@@ -116,9 +110,9 @@
     </header>
 
     <div class="container">
+        
         <div id="pantalla-areas">
             <h2 style="font-family: 'Montserrat'; color: var(--mdk-green); margin-bottom: 10px;">Selecciona tu Área</h2>
-            <p style="color: #666; font-size: 0.9rem;">Tatami que vas a calificar:</p>
             <div class="area-grid">
                 <button class="btn-area" onclick="seleccionarArea(1)">Área 1</button>
                 <button class="btn-area" onclick="seleccionarArea(2)">Área 2</button>
@@ -133,23 +127,25 @@
 
         <div id="loader">
             <div class="spinner"></div>
-            <p style="color: var(--mdk-green); font-weight: bold;">Sincronizando con el servidor...</p>
+            <p>Sincronizando con mesa de control...</p>
         </div>
 
         <div id="pantalla-combates">
-            <button class="btn-volver" onclick="volverAreas()">Cambiar de Área</button>
+            <button class="btn-volver" onclick="volverAreas()">Cambiar Área</button>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <h2 id="titulo-area" style="font-family: 'Montserrat'; color: var(--mdk-green);">Área X</h2>
-                <span id="contador-pendientes" style="background: var(--mdk-yellow); color: var(--mdk-green); padding: 4px 10px; border-radius: 12px; font-weight: bold; font-size: 0.8rem;">0 Pendientes</span>
+                <h2 id="titulo-area" style="font-family: 'Montserrat'; color: var(--mdk-green);">Área</h2>
+                <span id="contador-pendientes" style="background: var(--mdk-yellow); color: var(--mdk-green); padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.85rem;">0 Pendientes</span>
             </div>
             <div id="lista-graficas"></div>
         </div>
+
     </div>
 
     <div id="modal-juez" class="modal-overlay">
         <div class="modal-content">
-            <h2>🏆 Calificar Gráfica</h2>
-            <p id="modal-info" class="info"></p>
+            <h2 style="margin-bottom: 15px;">🏆 Calificar</h2>
+            <p id="modal-info" style="text-align: center; font-weight: bold; color: #666; margin-bottom: 20px; font-size: 0.9rem;"></p>
+            
             <div class="form-group">
                 <label>🥇 1er Lugar (Oro):</label>
                 <select id="select-oro"></select>
@@ -166,36 +162,36 @@
                 <label>🥉 3er Lugar (Bronce 2):</label>
                 <select id="select-bronce2"></select>
             </div>
-            <button onclick="enviarResultados()" class="btn-guardar" id="btn-submit">Guardar Resultados</button>
+
+            <button onclick="enviarResultados()" id="btn-submit" class="btn-guardar">Guardar Resultados</button>
             <button onclick="cerrarModal()" class="btn-cancelar">Cancelar</button>
         </div>
     </div>
 
     <script>
         window.APP_CONFIG = {
-            WEB_APP_URL: "https://script.google.com/macros/s/AKfycbwXH0jAOG__tp9BUhAB8aBmbgErcjLXqYo177L9yAm7hzgvDa5qDl44OgRVBhMbF5XgHQ/exec",
+            WEB_APP_URL: "https://script.google.com/macros/s/AKfycby8qJjsSir7OtawmfjJRipPLxueTSHa9XRXhWbGGk2nqe-tOm8GhYnrLhGFfZ-w7-__/exec",
         };
     </script>
 
-    <script src="assets/js/api.js?v=3"></script>
+    <script src="assets/js/api.js?v=5"></script>
 
     <script>
         let todasLasGraficas = [];
         let areaActual = null;
         let graficaActiva = null;
 
-        async function seleccionarArea(areaNum) {
+        async function seleccionarArea(num) {
+            areaActual = num;
             document.getElementById('pantalla-areas').style.display = 'none';
             document.getElementById('loader').style.display = 'block';
-            areaActual = areaNum;
-            document.getElementById('titulo-area').innerText = `Área ${areaNum}`;
+            document.getElementById('titulo-area').innerText = `Área ${num}`;
 
             try {
-                // Descarga datos ignorando el caché
                 todasLasGraficas = await API.getGraficas() || [];
-                renderizarLista();
-            } catch (error) {
-                alert("Error al conectar con la mesa de control.");
+                renderizar();
+            } catch (e) {
+                alert("Error de conexión");
                 volverAreas();
             }
         }
@@ -203,68 +199,61 @@
         function volverAreas() {
             document.getElementById('pantalla-combates').style.display = 'none';
             document.getElementById('pantalla-areas').style.display = 'block';
-            areaActual = null;
         }
 
-        function renderizarLista() {
+        function renderizar() {
             document.getElementById('loader').style.display = 'none';
             document.getElementById('pantalla-combates').style.display = 'block';
             const contenedor = document.getElementById('lista-graficas');
             
-            const pendientes = todasLasGraficas.filter(g => 
-                String(g.area) === String(areaActual) && 
-                String(g.estado).toUpperCase() !== 'FINALIZADA'
+            const pends = todasLasGraficas.filter(g => 
+                String(g.area) === String(areaActual) && String(g.estado).toUpperCase() !== 'FINALIZADA'
             );
 
-            document.getElementById('contador-pendientes').innerText = `${pendientes.length} Pendientes`;
+            document.getElementById('contador-pendientes').innerText = `${pends.length} Pendientes`;
 
-            if (pendientes.length === 0) {
-                contenedor.innerHTML = `<div class="mensaje-vacio">🎉 Sin pendientes en esta área.</div>`;
+            if (pends.length === 0) {
+                contenedor.innerHTML = '<div style="text-align:center; padding: 40px; color:#999;">🎉 No hay pendientes en esta área.</div>';
                 return;
             }
 
-            let html = '';
-            pendientes.forEach(g => {
+            contenedor.innerHTML = pends.map(g => {
                 const esFormas = String(g.modalidad).toUpperCase().includes('FORMA');
-                const badgeClass = esFormas ? 'bg-poomsae' : 'bg-kyorugui';
-                const cardClass = esFormas ? 'poomsae' : 'kyorugui';
-                const textoMod = esFormas ? '🥋 POOMSAE' : '🥊 KYORUGUI';
-                
-                const comps = g.competidores_data || [];
-                const textoComps = comps.map(c => c.nombre).join(' <span style="color:var(--status-danger);">vs</span> ');
+                const badge = esFormas ? 'bg-poomsae' : 'bg-kyorugui';
+                const card = esFormas ? 'poomsae' : 'kyorugui';
+                const modTxt = esFormas ? '🥋 POOMSAE' : '🥊 KYORUGUI';
+                const nombres = (g.competidores_data || []).map(c => c.nombre).join(' <span style="color:red">vs</span> ');
 
-                html += `
-                    <div class="tarjeta-grafica ${cardClass}">
-                        <div class="tg-header">
-                            <span class="tg-id">ID: ${g.id}</span>
-                            <span class="badge-mod ${badgeClass}">${textoMod}</span>
+                return `
+                    <div class="tarjeta-grafica ${card}">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <small style="color:#999; font-weight:bold;">ID: ${g.id}</small>
+                            <span class="badge-mod ${badge}">${modTxt}</span>
                         </div>
                         <div class="tg-body">
-                            <h3>${g.categoria || 'MDK'}</h3>
-                            <p>${g.cinta || ''}</p>
-                            <div class="tg-competidores">${textoComps}</div>
+                            <h3>${g.categoria || 'Categoría MDK'}</h3>
+                            <p style="color:#666; font-size:0.85rem;">${g.cinta || ''}</p>
+                            <div class="tg-competidores">${nombres}</div>
                         </div>
                         <button class="btn-calificar" onclick="abrirModal('${g.id}')">🎖️ Calificar</button>
                     </div>
                 `;
-            });
-            contenedor.innerHTML = html;
+            }).join('');
         }
 
         function abrirModal(id) {
             graficaActiva = todasLasGraficas.find(g => g.id === id);
             if (!graficaActiva) return;
 
-            const esFormas = String(graficaActiva.modalidad).toUpperCase().includes('FORMA');
-            document.getElementById('modal-info').innerText = `${esFormas ? 'POOMSAE' : 'KYORUGUI'} - ${graficaActiva.categoria}`;
+            document.getElementById('modal-info').innerText = `${graficaActiva.categoria}`;
             
             const selects = ['oro', 'plata', 'bronce1', 'bronce2'];
-            const compData = graficaActiva.competidores_data || [];
+            const comps = graficaActiva.competidores_data || [];
 
-            selects.forEach(pos => {
-                const s = document.getElementById(`select-${pos}`);
-                s.innerHTML = `<option value="">-- Seleccionar --</option>` + 
-                    compData.map(c => `<option value="${c.id}">${c.nombre}</option>`).join('');
+            selects.forEach(sId => {
+                const el = document.getElementById(`select-${sId}`);
+                el.innerHTML = '<option value="">-- Seleccionar --</option>' + 
+                    comps.map(c => `<option value="${c.id}">${c.nombre}</option>`).join('');
             });
 
             document.getElementById('modal-juez').style.display = 'flex';
@@ -272,35 +261,32 @@
 
         function cerrarModal() {
             document.getElementById('modal-juez').style.display = 'none';
-            graficaActiva = null;
         }
 
         async function enviarResultados() {
             const oro = document.getElementById('select-oro').value;
-            if (!oro) return alert("Selecciona al menos el 1er lugar.");
-            
+            if (!oro) return alert("Selecciona al menos el Oro.");
+
             const btn = document.getElementById('btn-submit');
             btn.innerText = "Sincronizando...";
             btn.disabled = true;
 
-            const resultados = {
+            const res = await API.registrarResultado(graficaActiva.id, {
                 oro: oro,
                 plata: document.getElementById('select-plata').value,
                 bronce1: document.getElementById('select-bronce1').value,
                 bronce2: document.getElementById('select-bronce2').value
-            };
+            });
 
-            const res = await API.registrarResultado(graficaActiva.id, resultados);
-            
             if (res && res.ok) {
-                cerrarModal();
                 graficaActiva.estado = 'FINALIZADA';
-                renderizarLista();
+                cerrarModal();
+                renderizar();
             } else {
-                alert("Error al guardar.");
-                btn.disabled = false;
-                btn.innerText = "Guardar Resultados";
+                alert("Error al guardar");
             }
+            btn.innerText = "Guardar Resultados";
+            btn.disabled = false;
         }
     </script>
 </body>
