@@ -3,117 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Graficador AMMDK | Panel Operativo</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Graficador AMMDK | Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
             --mdk-green: #006837;
             --mdk-yellow: #f9ed32;
             --mdk-black: #1a1a1a;
             --mdk-white: #ffffff;
-            --mdk-gray: #f2f2f2;
+            --mdk-gray: #f4f7f6;
             --status-ok: #27ae60;
-            --status-warn: #f39c12;
-            --status-danger: #c0392b;
         }
 
+        /* Estructura Base */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Open Sans', sans-serif; background-color: var(--mdk-gray); color: var(--mdk-black); display: flex; height: 100vh; overflow: hidden; }
 
-        /* SIDEBAR */
-        .sidebar { width: 280px; background-color: var(--mdk-black); color: white; display: flex; flex-direction: column; z-index: 10; }
-        .sidebar-header { padding: 30px 20px; text-align: center; background-color: var(--mdk-white); border-bottom: 5px solid var(--mdk-green); }
-        .sidebar-header img { max-width: 140px; height: auto; display: block; margin: 0 auto 10px auto; }
-        .sidebar-header h2 { font-family: 'Montserrat', sans-serif; font-size: 1.1rem; color: var(--mdk-green); font-weight: 700; }
-        
-        .sidebar-nav { flex: 1; padding: 20px 10px; }
-        .nav-item { display: block; width: 100%; padding: 15px 20px; margin-bottom: 5px; color: #ccc; text-decoration: none; border-radius: 4px; border: none; background: transparent; text-align: left; font-size: 0.85rem; font-weight: 600; cursor: pointer; text-transform: uppercase; transition: all 0.2s ease; }
-        .nav-item:hover { background-color: rgba(255,255,255,0.05); }
+        /* Barra Lateral (Sidebar) */
+        .sidebar { width: 260px; background-color: var(--mdk-black); color: white; display: flex; flex-direction: column; flex-shrink: 0; }
+        .sidebar-header { padding: 25px 20px; text-align: center; background-color: white; border-bottom: 4px solid var(--mdk-green); }
+        .sidebar-header img { width: 120px; height: auto; margin-bottom: 10px; }
+        .sidebar-header h2 { font-family: 'Montserrat', sans-serif; font-size: 1rem; color: var(--mdk-green); }
+
+        .sidebar-nav { flex: 1; padding: 20px 15px; }
+        .nav-item { 
+            display: flex; align-items: center; width: 100%; padding: 12px 15px; margin-bottom: 8px; 
+            color: #bdc3c7; border: none; background: transparent; cursor: pointer; 
+            font-size: 0.9rem; font-weight: 600; transition: 0.3s; border-radius: 6px;
+        }
+        .nav-item:hover { background: rgba(255,255,255,0.1); color: white; }
         .nav-item.active { background-color: var(--mdk-green); color: var(--mdk-yellow); }
 
-        /* MAIN */
-        .main-container { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
-        header.top-bar { padding: 15px 40px; background: var(--mdk-white); border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; }
-        header h1 { font-family: 'Montserrat', sans-serif; font-size: 1.2rem; color: var(--mdk-green); text-transform: uppercase; }
+        /* Contenedor Principal */
+        .main-container { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow-y: auto; }
+        
+        header.top-bar { 
+            padding: 15px 30px; background: white; border-bottom: 1px solid #dee2e6; 
+            display: flex; justify-content: space-between; align-items: center; sticky: top; 
+        }
+        header h1 { font-family: 'Montserrat', sans-serif; font-size: 1.1rem; color: var(--mdk-green); text-transform: uppercase; }
 
-        .content-padding { padding: 30px 40px; }
+        /* Dashboard y KPIs */
+        .content-padding { padding: 25px 30px; }
+        .kpi-grid { 
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+            gap: 20px; margin-bottom: 30px; 
+        }
+        .kpi-card { 
+            background: white; padding: 20px; border-radius: 8px; border-left: 5px solid var(--mdk-green); 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: transform 0.2s;
+        }
+        .kpi-card:hover { transform: translateY(-3px); }
+        .kpi-card h3 { font-size: 0.75rem; text-transform: uppercase; color: #7f8c8d; margin-bottom: 10px; letter-spacing: 0.5px; }
+        .kpi-card .value { font-size: 1.8rem; font-weight: 700; color: var(--mdk-black); }
 
-        /* KPI CARDS */
-        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .kpi-card { background: white; padding: 20px; border-radius: 4px; border-top: 5px solid var(--mdk-green); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .kpi-card h3 { font-size: 0.7rem; text-transform: uppercase; color: #666; letter-spacing: 1px; }
-        .kpi-card .value { font-size: 2rem; font-weight: 700; color: var(--mdk-green); margin-top: 5px; }
+        /* Tablas */
+        .table-container { background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f8f9fa; color: var(--mdk-green); padding: 15px; text-align: left; font-size: 0.8rem; text-transform: uppercase; border-bottom: 2px solid #eee; }
+        td { padding: 15px; border-bottom: 1px solid #f1f1f1; font-size: 0.9rem; }
+        tr:last-child td { border-bottom: none; }
 
-        /* TABLAS */
-        table { width: 100%; border-collapse: collapse; background: white; border-radius: 4px; overflow: hidden; }
-        th { background: var(--mdk-green); color: var(--mdk-yellow); padding: 15px; text-align: left; font-size: 0.75rem; text-transform: uppercase; }
-        td { padding: 15px; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+        /* Footer Sidebar */
+        .sidebar-footer { padding: 15px; font-size: 0.7rem; color: #555; text-align: center; border-top: 1px solid #222; }
     </style>
 </head>
 <body>
 
     <aside class="sidebar">
         <div class="sidebar-header">
-            <img src="assets/logo.jpg" alt="AMMDK">
-            <h2>AMMDK</h2>
-            <p style="font-size: 0.6rem; color: #666; font-weight: bold;">PANEL OPERATIVO</p>
+            <img src="assets/logo.jpg" alt="Logo AMMDK">
+            <h2>AMMDK ADMIN</h2>
         </div>
         <nav class="sidebar-nav">
-            <button class="nav-item active" onclick="showView('dashboard')">🏠 Resumen</button>
-            <button class="nav-item" onclick="showView('areas')">📍 Áreas</button>
-            <button class="nav-item" onclick="showView('graficas')">📊 Gráficas</button>
-            <button class="nav-item" onclick="mostrarRanking(event)" style="margin-top: 20px; color: var(--mdk-yellow); border: 1px solid var(--mdk-yellow);">🏆 Ranking</button>
+            <button class="nav-item active" onclick="showView('dashboard')">📊 Resumen General</button>
+            <button class="nav-item" onclick="showView('areas')">📍 Control de Áreas</button>
+            <button class="nav-item" onclick="showView('graficas')">🥋 Lista de Gráficas</button>
+            <button class="nav-item" onclick="mostrarRanking()" style="margin-top: 20px; border: 1px solid var(--mdk-yellow); color: var(--mdk-yellow);">🏆 Ranking Escuelas</button>
         </nav>
-        <div style="padding: 15px; font-size: 0.6rem; color: #444; text-align: center; background: #000;">
-            SBN SERGIO RODRIGUEZ | 2026
+        <div class="sidebar-footer">
+            AMMDK v6.0 | Sergio Rodriguez
         </div>
     </aside>
 
     <div class="main-container">
         <header class="top-bar">
-            <h1 id="page-title">Resumen del Torneo</h1>
-            <div id="status-online" style="color: var(--status-ok); font-size: 0.7rem; font-weight: bold;">● CONECTADO A GOOGLE</div>
+            <h1 id="page-title">Resumen General</h1>
+            <div id="status" style="font-size: 0.7rem; color: var(--status-ok); font-weight: bold;">● SISTEMA ONLINE</div>
         </header>
 
         <div id="vista-dashboard" class="content-padding">
             <div class="kpi-grid">
                 <div class="kpi-card">
-                    <h3>Total Alumnos</h3>
-                    <div id="kpi-alumnos" class="value">--</div>
+                    <h3>Alumnos Inscritos</h3>
+                    <div id="kpi-alumnos" class="value">0</div>
                 </div>
                 <div class="kpi-card">
-                    <h3>Total Gráficas</h3>
-                    <div id="kpi-graficas" class="value">--</div>
+                    <h3>Gráficas Totales</h3>
+                    <div id="kpi-graficas" class="value">0</div>
                 </div>
-                <div class="kpi-card">
-                    <h3>Pendientes</h3>
-                    <div id="kpi-pendientes" class="value">--</div>
+                <div class="kpi-card" style="border-left-color: #f39c12;">
+                    <h3>Por Competir</h3>
+                    <div id="kpi-pendientes" class="value">0</div>
                 </div>
-                <div class="kpi-card">
+                <div class="kpi-card" style="border-left-color: var(--status-ok);">
                     <h3>Finalizadas</h3>
-                    <div id="kpi-finalizadas" class="value" style="color: var(--status-ok);">--</div>
+                    <div id="kpi-finalizadas" class="value">0</div>
                 </div>
             </div>
-            <div id="dashboard-extra"></div>
+            <div id="dashboard-content"></div>
         </div>
 
         <div id="main-content" class="content-padding" style="display: none;"></div>
 
         <div id="vista-ranking" class="content-padding" style="display: none;">
-            <h2 style="color: var(--mdk-green); margin-bottom: 20px;">🏆 Ranking por Escuelas</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Escuela</th>
-                        <th style="text-align: center;">🥇</th>
-                        <th style="text-align: center;">🥈</th>
-                        <th style="text-align: center;">🥉</th>
-                        <th style="text-align: right;">Total</th>
-                    </tr>
-                </thead>
-                <tbody id="tabla-ranking-body"></tbody>
-            </table>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th># Posición</th>
+                            <th>Escuela / Doyang</th>
+                            <th style="text-align: center;">🥇</th>
+                            <th style="text-align: center;">🥈</th>
+                            <th style="text-align: center;">🥉</th>
+                            <th style="text-align: right;">Total Puntos</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-ranking-body"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -129,45 +147,46 @@
     <script src="assets/js/graficas.js?v=6"></script>
 
     <script>
-        // Inicialización y Lógica de Vistas
+        // Lógica de navegación y carga
         window.onload = async () => {
-            await actualizarKPIs();
+            await cargarDatosDashboard();
             if (typeof App !== 'undefined') await App.init();
         };
 
-        async function actualizarKPIs() {
-            const res = await API.getResumen();
-            if (res) {
-                document.getElementById('kpi-alumnos').innerText = res.totalAlumnos || 0;
-                document.getElementById('kpi-graficas').innerText = res.totalGraficas || 0;
-                document.getElementById('kpi-pendientes').innerText = res.pendientes || 0;
-                document.getElementById('kpi-finalizadas').innerText = res.finalizadas || 0;
+        async function cargarDatosDashboard() {
+            const data = await API.getResumen();
+            if (data) {
+                document.getElementById('kpi-alumnos').innerText = data.totalAlumnos || 0;
+                document.getElementById('kpi-graficas').innerText = data.totalGraficas || 0;
+                document.getElementById('kpi-pendientes').innerText = data.pendientes || 0;
+                document.getElementById('kpi-finalizadas').innerText = data.finalizadas || 0;
             }
         }
 
         function showView(view) {
+            // Manejo de visibilidad de contenedores
             document.getElementById('vista-dashboard').style.display = view === 'dashboard' ? 'block' : 'none';
             document.getElementById('vista-ranking').style.display = 'none';
             document.getElementById('main-content').style.display = (view !== 'dashboard' && view !== 'ranking') ? 'block' : 'none';
             
-            document.getElementById('page-title').innerText = view.toUpperCase();
+            document.getElementById('page-title').innerText = view.replace('dashboard', 'Resumen General').toUpperCase();
             
-            const btns = document.querySelectorAll('.nav-item');
-            btns.forEach(b => b.classList.remove('active'));
-            
-            if (view === 'dashboard') actualizarKPIs();
+            // Estética de botones
+            document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
+            event?.currentTarget?.classList?.add('active');
+
+            if (view === 'dashboard') cargarDatosDashboard();
             if (typeof App !== 'undefined' && view !== 'ranking') App.renderView(view);
         }
 
-        async function mostrarRanking(e) {
-            document.getElementById('vista-dashboard').style.display = 'none';
-            document.getElementById('main-content').style.display = 'none';
+        async function mostrarRanking() {
+            showView('ranking');
             document.getElementById('vista-ranking').style.display = 'block';
-            document.getElementById('page-title').innerText = "RANKING DE ESCUELAS";
+            document.getElementById('page-title').innerText = "RANKING POR ESCUELAS";
 
             const ranking = await API.getRanking();
             const tbody = document.getElementById('tabla-ranking-body');
-            tbody.innerHTML = ranking.map((r, i) => `
+            tbody.innerHTML = (ranking || []).map((r, i) => `
                 <tr>
                     <td><strong>${i + 1}</strong></td>
                     <td style="font-weight: bold; color: var(--mdk-green);">${r.escuela}</td>
