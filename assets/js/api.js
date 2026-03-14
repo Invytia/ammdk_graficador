@@ -1,32 +1,22 @@
 // ==========================================
-// CONEXIÓN MAESTRA AMMDK v6.0
+// CONEXIÓN DIRECTA A GOOGLE APPS SCRIPT
 // ==========================================
 
-/**
- * El API utiliza la URL configurada en el index.html para mayor flexibilidad.
- * Usa tu URL más reciente como respaldo.
- */
-const WEB_APP_URL = (window.APP_CONFIG && window.APP_CONFIG.WEB_APP_URL) 
-    ? window.APP_CONFIG.WEB_APP_URL 
-    : "https://script.google.com/macros/s/AKfycby8qJjsSir7OtawmfjJRipPLxueTSHa9XRXhWbGGk2nqe-tOm8GhYnrLhGFfZ-w7-__/exec";
+// ¡NUEVA URL DEFINITIVA!
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwXH0jAOG__tp9BUhAB8aBmbgErcjLXqYo177L9yAm7hzgvDa5qDl44OgRVBhMbF5XgHQ/exec";
 
 const API = {
     // ---------------------------------------------------
-    // MOTOR DE PETICIONES (NÚCLEO CON ANTI-CACHÉ)
+    // MOTOR DE PETICIONES
     // ---------------------------------------------------
     async peticionGET(accion, parametrosExtra = "") {
         try {
-            // Generamos un sello de tiempo para obligar a Google a dar datos frescos
-            const antiCache = `&_ts=${new Date().getTime()}`;
-            const urlCompleta = `${WEB_APP_URL}?action=${accion}${parametrosExtra}${antiCache}`;
-            
+            const urlCompleta = `${WEB_APP_URL}?action=${accion}${parametrosExtra}`;
             const respuesta = await fetch(urlCompleta);
-            if (!respuesta.ok) throw new Error('Error en la respuesta del servidor');
-            
-            const datos = await respuesta.json();
-            return datos;
+            if (!respuesta.ok) throw new Error('Falló la red');
+            return await respuesta.json();
         } catch (error) {
-            console.error(`[API ERROR] Falló la descarga de (${accion}):`, error);
+            console.error(`[API] Error descargando (${accion}):`, error);
             return null;
         }
     },
@@ -35,13 +25,13 @@ const API = {
         try {
             const respuesta = await fetch(WEB_APP_URL, {
                 method: 'POST',
-                // text/plain es necesario para evitar bloqueos de CORS en Google Apps Script
+                // Importante para Google Sheets: text/plain para evitar bloqueos
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify(datos)
             });
             return await respuesta.json();
         } catch (error) {
-            console.error(`[API ERROR] No se pudo enviar la información:`, error);
+            console.error(`[API] Error enviando datos:`, error);
             return { ok: false, error: error.message };
         }
     },
@@ -49,8 +39,6 @@ const API = {
     // ---------------------------------------------------
     // FUNCIONES DE LECTURA (GET)
     // ---------------------------------------------------
-    
-    // Crucial para llenar los KPIs del Dashboard (Total Alumnos, Gráficas, etc.)
     getResumen: async function() { 
         return await this.peticionGET('resumen'); 
     },
@@ -63,8 +51,11 @@ const API = {
         return await this.peticionGET('graficas'); 
     },
     
+    getValidaciones: async function() { 
+        return await this.peticionGET('validaciones'); 
+    },
+    
     getRanking: async function() { 
-        // Alimenta la tabla de posiciones por escuela
         return await this.peticionGET('ranking'); 
     },
     
@@ -75,15 +66,12 @@ const API = {
     // ---------------------------------------------------
     // FUNCIONES DE ESCRITURA (POST)
     // ---------------------------------------------------
-    
-    // Dispara el motor de generación de gráficas desde la web
     generarGraficas: async function() {
         return await this.peticionPOST({ 
             action: 'generar' 
         });
     },
 
-    // Usada por Jueces y Administrador para cerrar combates
     registrarResultado: async function(id_grafica, resultados) {
         return await this.peticionPOST({
             action: 'registrar_resultado',
