@@ -20,7 +20,6 @@
 
         body { background-color: var(--mdk-gray); color: var(--mdk-black); padding-bottom: 50px; }
 
-        /* HEADER MÓVIL */
         header {
             background-color: var(--mdk-green);
             color: var(--mdk-white);
@@ -37,7 +36,6 @@
 
         .container { padding: 20px; max-width: 800px; margin: 0 auto; }
 
-        /* PANTALLA 1: SELECTOR DE ÁREA */
         #pantalla-areas { text-align: center; }
         .area-grid {
             display: grid;
@@ -59,7 +57,6 @@
         }
         .btn-area:active { transform: scale(0.95); background-color: var(--mdk-green); color: var(--mdk-yellow); }
 
-        /* PANTALLA 2: LISTA DE COMBATES */
         #pantalla-combates { display: none; }
         .btn-volver {
             background: transparent; border: none; color: var(--mdk-green); font-weight: bold; font-size: 1rem;
@@ -88,11 +85,10 @@
 
         .btn-calificar {
             background-color: var(--mdk-green); color: var(--mdk-yellow); border: none;
-            padding: 15px; border-radius: 4px; font-size: 1rem; font-weight: bold;
+            padding: 18px; border-radius: 4px; font-size: 1.1rem; font-weight: bold;
             text-transform: uppercase; cursor: pointer; margin-top: 10px; width: 100%;
         }
 
-        /* MODAL DE JUEZ (Optimizado para Touch) */
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 999; justify-content: center; align-items: center; padding: 20px; }
         .modal-content { background: white; padding: 25px; border-radius: 8px; width: 100%; max-width: 400px; max-height: 90vh; overflow-y: auto; border-top: 5px solid var(--mdk-green); }
         .modal-content h2 { font-family: 'Montserrat'; color: var(--mdk-green); text-align: center; margin-bottom: 5px; }
@@ -103,10 +99,9 @@
         .form-group select { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 1rem; background: var(--mdk-gray); outline: none; }
         .form-group select:focus { border-color: var(--mdk-green); }
 
-        .btn-guardar { background-color: var(--mdk-green); color: white; border: none; padding: 15px; border-radius: 6px; font-size: 1.1rem; font-weight: bold; cursor: pointer; width: 100%; text-transform: uppercase; margin-top: 10px; }
+        .btn-guardar { background-color: var(--mdk-green); color: white; border: none; padding: 18px; border-radius: 6px; font-size: 1.1rem; font-weight: bold; cursor: pointer; width: 100%; text-transform: uppercase; margin-top: 10px; }
         .btn-cancelar { background: transparent; color: var(--status-danger); border: none; padding: 15px; font-size: 1rem; font-weight: bold; cursor: pointer; width: 100%; margin-top: 5px; text-decoration: underline; }
 
-        /* LOADING Y MENSAJES */
         #loader { text-align: center; padding: 50px; display: none; }
         .spinner { border: 4px solid rgba(0,0,0,0.1); width: 40px; height: 40px; border-radius: 50%; border-left-color: var(--mdk-green); animation: spin 1s linear infinite; margin: 0 auto 15px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -121,11 +116,9 @@
     </header>
 
     <div class="container">
-        
         <div id="pantalla-areas">
             <h2 style="font-family: 'Montserrat'; color: var(--mdk-green); margin-bottom: 10px;">Selecciona tu Área</h2>
-            <p style="color: #666; font-size: 0.9rem;">Elige el tatami que vas a calificar para ver tus gráficas pendientes.</p>
-            
+            <p style="color: #666; font-size: 0.9rem;">Tatami que vas a calificar:</p>
             <div class="area-grid">
                 <button class="btn-area" onclick="seleccionarArea(1)">Área 1</button>
                 <button class="btn-area" onclick="seleccionarArea(2)">Área 2</button>
@@ -140,7 +133,7 @@
 
         <div id="loader">
             <div class="spinner"></div>
-            <p style="color: var(--mdk-green); font-weight: bold;">Sincronizando con la mesa de control...</p>
+            <p style="color: var(--mdk-green); font-weight: bold;">Sincronizando con el servidor...</p>
         </div>
 
         <div id="pantalla-combates">
@@ -149,20 +142,14 @@
                 <h2 id="titulo-area" style="font-family: 'Montserrat'; color: var(--mdk-green);">Área X</h2>
                 <span id="contador-pendientes" style="background: var(--mdk-yellow); color: var(--mdk-green); padding: 4px 10px; border-radius: 12px; font-weight: bold; font-size: 0.8rem;">0 Pendientes</span>
             </div>
-            
-            <div id="lista-graficas">
-                </div>
+            <div id="lista-graficas"></div>
         </div>
-
     </div>
 
     <div id="modal-juez" class="modal-overlay">
         <div class="modal-content">
             <h2>🏆 Calificar Gráfica</h2>
             <p id="modal-info" class="info"></p>
-            
-            <input type="hidden" id="grafica-activa-id">
-            
             <div class="form-group">
                 <label>🥇 1er Lugar (Oro):</label>
                 <select id="select-oro"></select>
@@ -179,11 +166,16 @@
                 <label>🥉 3er Lugar (Bronce 2):</label>
                 <select id="select-bronce2"></select>
             </div>
-
             <button onclick="enviarResultados()" class="btn-guardar" id="btn-submit">Guardar Resultados</button>
             <button onclick="cerrarModal()" class="btn-cancelar">Cancelar</button>
         </div>
     </div>
+
+    <script>
+        window.APP_CONFIG = {
+            WEB_APP_URL: "https://script.google.com/macros/s/AKfycbwXH0jAOG__tp9BUhAB8aBmbgErcjLXqYo177L9yAm7hzgvDa5qDl44OgRVBhMbF5XgHQ/exec",
+        };
+    </script>
 
     <script src="assets/js/api.js?v=3"></script>
 
@@ -192,7 +184,6 @@
         let areaActual = null;
         let graficaActiva = null;
 
-        // Inicia el flujo pidiendo los datos al servidor
         async function seleccionarArea(areaNum) {
             document.getElementById('pantalla-areas').style.display = 'none';
             document.getElementById('loader').style.display = 'block';
@@ -200,11 +191,11 @@
             document.getElementById('titulo-area').innerText = `Área ${areaNum}`;
 
             try {
-                // Descarga las gráficas fresquecitas
+                // Descarga datos ignorando el caché
                 todasLasGraficas = await API.getGraficas() || [];
                 renderizarLista();
             } catch (error) {
-                alert("Error de conexión. Intenta de nuevo.");
+                alert("Error al conectar con la mesa de control.");
                 volverAreas();
             }
         }
@@ -218,10 +209,8 @@
         function renderizarLista() {
             document.getElementById('loader').style.display = 'none';
             document.getElementById('pantalla-combates').style.display = 'block';
-            
             const contenedor = document.getElementById('lista-graficas');
             
-            // FILTRO ESTRICTO: Solo Área elegida y que NO estén FINALIZADAS
             const pendientes = todasLasGraficas.filter(g => 
                 String(g.area) === String(areaActual) && 
                 String(g.estado).toUpperCase() !== 'FINALIZADA'
@@ -230,7 +219,7 @@
             document.getElementById('contador-pendientes').innerText = `${pendientes.length} Pendientes`;
 
             if (pendientes.length === 0) {
-                contenedor.innerHTML = `<div class="mensaje-vacio">🎉 ¡Felicidades! Esta área no tiene combates pendientes.</div>`;
+                contenedor.innerHTML = `<div class="mensaje-vacio">🎉 Sin pendientes en esta área.</div>`;
                 return;
             }
 
@@ -240,21 +229,20 @@
                 const badgeClass = esFormas ? 'bg-poomsae' : 'bg-kyorugui';
                 const cardClass = esFormas ? 'poomsae' : 'kyorugui';
                 const textoMod = esFormas ? '🥋 POOMSAE' : '🥊 KYORUGUI';
-
-                let competidoresNombres = [];
-                if (g.competidores_data) { competidoresNombres = g.competidores_data.map(c => c.nombre); }
-                const textoCompetidores = competidoresNombres.join(' <span style="color:var(--status-danger);">vs</span> ') || 'Sin competidores';
+                
+                const comps = g.competidores_data || [];
+                const textoComps = comps.map(c => c.nombre).join(' <span style="color:var(--status-danger);">vs</span> ');
 
                 html += `
                     <div class="tarjeta-grafica ${cardClass}">
                         <div class="tg-header">
-                            <span class="tg-id">ID: ${g.id.substring(0,6)}</span>
+                            <span class="tg-id">ID: ${g.id}</span>
                             <span class="badge-mod ${badgeClass}">${textoMod}</span>
                         </div>
                         <div class="tg-body">
-                            <h3>${g.categoria || 'Categoría Única'}</h3>
-                            <p>${g.cinta || 'Cintas Mixtas'}</p>
-                            <div class="tg-competidores">${textoCompetidores}</div>
+                            <h3>${g.categoria || 'MDK'}</h3>
+                            <p>${g.cinta || ''}</p>
+                            <div class="tg-competidores">${textoComps}</div>
                         </div>
                         <button class="btn-calificar" onclick="abrirModal('${g.id}')">🎖️ Calificar</button>
                     </div>
@@ -267,19 +255,16 @@
             graficaActiva = todasLasGraficas.find(g => g.id === id);
             if (!graficaActiva) return;
 
-            const isFormas = String(graficaActiva.modalidad).toUpperCase().includes('FORMA');
-            document.getElementById('modal-info').innerText = `${isFormas ? '🥋 POOMSAE' : '🥊 KYORUGUI'} - ${graficaActiva.categoria}`;
+            const esFormas = String(graficaActiva.modalidad).toUpperCase().includes('FORMA');
+            document.getElementById('modal-info').innerText = `${esFormas ? 'POOMSAE' : 'KYORUGUI'} - ${graficaActiva.categoria}`;
             
             const selects = ['oro', 'plata', 'bronce1', 'bronce2'];
             const compData = graficaActiva.competidores_data || [];
 
             selects.forEach(pos => {
-                const select = document.getElementById(`select-${pos}`);
-                let options = `<option value="">-- Seleccionar --</option>`;
-                compData.forEach(c => {
-                    options += `<option value="${c.id}">${c.nombre}</option>`;
-                });
-                select.innerHTML = options;
+                const s = document.getElementById(`select-${pos}`);
+                s.innerHTML = `<option value="">-- Seleccionar --</option>` + 
+                    compData.map(c => `<option value="${c.id}">${c.nombre}</option>`).join('');
             });
 
             document.getElementById('modal-juez').style.display = 'flex';
@@ -292,12 +277,11 @@
 
         async function enviarResultados() {
             const oro = document.getElementById('select-oro').value;
+            if (!oro) return alert("Selecciona al menos el 1er lugar.");
+            
             const btn = document.getElementById('btn-submit');
-
-            if (!oro) {
-                alert("⚠️ Debes seleccionar al menos un ganador (1er Lugar).");
-                return;
-            }
+            btn.innerText = "Sincronizando...";
+            btn.disabled = true;
 
             const resultados = {
                 oro: oro,
@@ -306,21 +290,16 @@
                 bronce2: document.getElementById('select-bronce2').value
             };
 
-            btn.innerText = "⏳ Guardando...";
-            btn.disabled = true;
-
             const res = await API.registrarResultado(graficaActiva.id, resultados);
             
-            btn.innerText = "Guardar Resultados";
-            btn.disabled = false;
-
             if (res && res.ok) {
                 cerrarModal();
-                // Desaparecemos la gráfica visualmente de inmediato para que el juez siga con la que sigue
-                graficaActiva.estado = 'FINALIZADA'; 
-                renderizarLista(); 
+                graficaActiva.estado = 'FINALIZADA';
+                renderizarLista();
             } else {
-                alert("❌ Error al guardar. Verifica tu conexión.");
+                alert("Error al guardar.");
+                btn.disabled = false;
+                btn.innerText = "Guardar Resultados";
             }
         }
     </script>
