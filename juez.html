@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Panel de Juez | AMMDK</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        /* PALETA MDK OFICIAL */
+        :root {
+            --mdk-green: #006837;
+            --mdk-yellow: #f9ed32;
+            --mdk-black: #1a1a1a;
+            --mdk-white: #ffffff;
+            --mdk-gray: #f2f2f2;
+            --status-danger: #c0392b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Open Sans', sans-serif; }
+
+        body { background-color: var(--mdk-gray); color: var(--mdk-black); padding-bottom: 50px; }
+
+        /* HEADER MÓVIL */
+        header {
+            background-color: var(--mdk-green);
+            color: var(--mdk-white);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 5px solid var(--mdk-yellow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        header h1 { font-family: 'Montserrat', sans-serif; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 1px; }
+        header p { font-size: 0.8rem; color: var(--mdk-yellow); font-weight: bold; margin-top: 5px; }
+
+        .container { padding: 20px; max-width: 800px; margin: 0 auto; }
+
+        /* PANTALLA 1: SELECTOR DE ÁREA */
+        #pantalla-areas { text-align: center; }
+        .area-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .btn-area {
+            background-color: var(--mdk-white);
+            border: 3px solid var(--mdk-green);
+            border-radius: 8px;
+            padding: 30px 10px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--mdk-green);
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.1s;
+        }
+        .btn-area:active { transform: scale(0.95); background-color: var(--mdk-green); color: var(--mdk-yellow); }
+
+        /* PANTALLA 2: LISTA DE COMBATES */
+        #pantalla-combates { display: none; }
+        .btn-volver {
+            background: transparent; border: none; color: var(--mdk-green); font-weight: bold; font-size: 1rem;
+            margin-bottom: 20px; cursor: pointer; display: flex; align-items: center;
+        }
+        .btn-volver::before { content: '←'; margin-right: 5px; font-size: 1.2rem; }
+
+        .tarjeta-grafica {
+            background: white; border-radius: 8px; padding: 20px; margin-bottom: 15px;
+            border-left: 6px solid var(--mdk-green);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .tarjeta-grafica.poomsae { border-left-color: #2980b9; }
+        .tarjeta-grafica.kyorugui { border-left-color: #c0392b; }
+
+        .tg-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .tg-id { font-weight: bold; color: #666; font-size: 0.8rem; }
+        .badge-mod { padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; color: white; letter-spacing: 0.5px; }
+        .bg-poomsae { background-color: #2980b9; }
+        .bg-kyorugui { background-color: #c0392b; }
+
+        .tg-body h3 { font-family: 'Montserrat', sans-serif; font-size: 1.1rem; color: var(--mdk-black); }
+        .tg-body p { font-size: 0.9rem; color: #666; margin-top: 5px; }
+        .tg-competidores { margin-top: 15px; background: var(--mdk-gray); padding: 10px; border-radius: 4px; font-weight: 600; font-size: 0.95rem; text-align: center; }
+
+        .btn-calificar {
+            background-color: var(--mdk-green); color: var(--mdk-yellow); border: none;
+            padding: 15px; border-radius: 4px; font-size: 1rem; font-weight: bold;
+            text-transform: uppercase; cursor: pointer; margin-top: 10px; width: 100%;
+        }
+
+        /* MODAL DE JUEZ (Optimizado para Touch) */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 999; justify-content: center; align-items: center; padding: 20px; }
+        .modal-content { background: white; padding: 25px; border-radius: 8px; width: 100%; max-width: 400px; max-height: 90vh; overflow-y: auto; border-top: 5px solid var(--mdk-green); }
+        .modal-content h2 { font-family: 'Montserrat'; color: var(--mdk-green); text-align: center; margin-bottom: 5px; }
+        .modal-content p.info { text-align: center; font-size: 0.85rem; color: #666; font-weight: bold; margin-bottom: 20px; }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.9rem; }
+        .form-group select { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 1rem; background: var(--mdk-gray); outline: none; }
+        .form-group select:focus { border-color: var(--mdk-green); }
+
+        .btn-guardar { background-color: var(--mdk-green); color: white; border: none; padding: 15px; border-radius: 6px; font-size: 1.1rem; font-weight: bold; cursor: pointer; width: 100%; text-transform: uppercase; margin-top: 10px; }
+        .btn-cancelar { background: transparent; color: var(--status-danger); border: none; padding: 15px; font-size: 1rem; font-weight: bold; cursor: pointer; width: 100%; margin-top: 5px; text-decoration: underline; }
+
+        /* LOADING Y MENSAJES */
+        #loader { text-align: center; padding: 50px; display: none; }
+        .spinner { border: 4px solid rgba(0,0,0,0.1); width: 40px; height: 40px; border-radius: 50%; border-left-color: var(--mdk-green); animation: spin 1s linear infinite; margin: 0 auto 15px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .mensaje-vacio { text-align: center; padding: 40px 20px; color: #666; font-style: italic; background: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Panel de Juez</h1>
+        <p>Asociación Mexicana MDK</p>
+    </header>
+
+    <div class="container">
+        
+        <div id="pantalla-areas">
+            <h2 style="font-family: 'Montserrat'; color: var(--mdk-green); margin-bottom: 10px;">Selecciona tu Área</h2>
+            <p style="color: #666; font-size: 0.9rem;">Elige el tatami que vas a calificar para ver tus gráficas pendientes.</p>
+            
+            <div class="area-grid">
+                <button class="btn-area" onclick="seleccionarArea(1)">Área 1</button>
+                <button class="btn-area" onclick="seleccionarArea(2)">Área 2</button>
+                <button class="btn-area" onclick="seleccionarArea(3)">Área 3</button>
+                <button class="btn-area" onclick="seleccionarArea(4)">Área 4</button>
+                <button class="btn-area" onclick="seleccionarArea(5)">Área 5</button>
+                <button class="btn-area" onclick="seleccionarArea(6)">Área 6</button>
+                <button class="btn-area" onclick="seleccionarArea(7)">Área 7</button>
+                <button class="btn-area" onclick="seleccionarArea(8)">Área 8</button>
+            </div>
+        </div>
+
+        <div id="loader">
+            <div class="spinner"></div>
+            <p style="color: var(--mdk-green); font-weight: bold;">Sincronizando con la mesa de control...</p>
+        </div>
+
+        <div id="pantalla-combates">
+            <button class="btn-volver" onclick="volverAreas()">Cambiar de Área</button>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h2 id="titulo-area" style="font-family: 'Montserrat'; color: var(--mdk-green);">Área X</h2>
+                <span id="contador-pendientes" style="background: var(--mdk-yellow); color: var(--mdk-green); padding: 4px 10px; border-radius: 12px; font-weight: bold; font-size: 0.8rem;">0 Pendientes</span>
+            </div>
+            
+            <div id="lista-graficas">
+                </div>
+        </div>
+
+    </div>
+
+    <div id="modal-juez" class="modal-overlay">
+        <div class="modal-content">
+            <h2>🏆 Calificar Gráfica</h2>
+            <p id="modal-info" class="info"></p>
+            
+            <input type="hidden" id="grafica-activa-id">
+            
+            <div class="form-group">
+                <label>🥇 1er Lugar (Oro):</label>
+                <select id="select-oro"></select>
+            </div>
+            <div class="form-group">
+                <label>🥈 2do Lugar (Plata):</label>
+                <select id="select-plata"></select>
+            </div>
+            <div class="form-group">
+                <label>🥉 3er Lugar (Bronce 1):</label>
+                <select id="select-bronce1"></select>
+            </div>
+            <div class="form-group">
+                <label>🥉 3er Lugar (Bronce 2):</label>
+                <select id="select-bronce2"></select>
+            </div>
+
+            <button onclick="enviarResultados()" class="btn-guardar" id="btn-submit">Guardar Resultados</button>
+            <button onclick="cerrarModal()" class="btn-cancelar">Cancelar</button>
+        </div>
+    </div>
+
+    <script src="assets/js/api.js?v=3"></script>
+
+    <script>
+        let todasLasGraficas = [];
+        let areaActual = null;
+        let graficaActiva = null;
+
+        // Inicia el flujo pidiendo los datos al servidor
+        async function seleccionarArea(areaNum) {
+            document.getElementById('pantalla-areas').style.display = 'none';
+            document.getElementById('loader').style.display = 'block';
+            areaActual = areaNum;
+            document.getElementById('titulo-area').innerText = `Área ${areaNum}`;
+
+            try {
+                // Descarga las gráficas fresquecitas
+                todasLasGraficas = await API.getGraficas() || [];
+                renderizarLista();
+            } catch (error) {
+                alert("Error de conexión. Intenta de nuevo.");
+                volverAreas();
+            }
+        }
+
+        function volverAreas() {
+            document.getElementById('pantalla-combates').style.display = 'none';
+            document.getElementById('pantalla-areas').style.display = 'block';
+            areaActual = null;
+        }
+
+        function renderizarLista() {
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('pantalla-combates').style.display = 'block';
+            
+            const contenedor = document.getElementById('lista-graficas');
+            
+            // FILTRO ESTRICTO: Solo Área elegida y que NO estén FINALIZADAS
+            const pendientes = todasLasGraficas.filter(g => 
+                String(g.area) === String(areaActual) && 
+                String(g.estado).toUpperCase() !== 'FINALIZADA'
+            );
+
+            document.getElementById('contador-pendientes').innerText = `${pendientes.length} Pendientes`;
+
+            if (pendientes.length === 0) {
+                contenedor.innerHTML = `<div class="mensaje-vacio">🎉 ¡Felicidades! Esta área no tiene combates pendientes.</div>`;
+                return;
+            }
+
+            let html = '';
+            pendientes.forEach(g => {
+                const esFormas = String(g.modalidad).toUpperCase().includes('FORMA');
+                const badgeClass = esFormas ? 'bg-poomsae' : 'bg-kyorugui';
+                const cardClass = esFormas ? 'poomsae' : 'kyorugui';
+                const textoMod = esFormas ? '🥋 POOMSAE' : '🥊 KYORUGUI';
+
+                let competidoresNombres = [];
+                if (g.competidores_data) { competidoresNombres = g.competidores_data.map(c => c.nombre); }
+                const textoCompetidores = competidoresNombres.join(' <span style="color:var(--status-danger);">vs</span> ') || 'Sin competidores';
+
+                html += `
+                    <div class="tarjeta-grafica ${cardClass}">
+                        <div class="tg-header">
+                            <span class="tg-id">ID: ${g.id.substring(0,6)}</span>
+                            <span class="badge-mod ${badgeClass}">${textoMod}</span>
+                        </div>
+                        <div class="tg-body">
+                            <h3>${g.categoria || 'Categoría Única'}</h3>
+                            <p>${g.cinta || 'Cintas Mixtas'}</p>
+                            <div class="tg-competidores">${textoCompetidores}</div>
+                        </div>
+                        <button class="btn-calificar" onclick="abrirModal('${g.id}')">🎖️ Calificar</button>
+                    </div>
+                `;
+            });
+            contenedor.innerHTML = html;
+        }
+
+        function abrirModal(id) {
+            graficaActiva = todasLasGraficas.find(g => g.id === id);
+            if (!graficaActiva) return;
+
+            const isFormas = String(graficaActiva.modalidad).toUpperCase().includes('FORMA');
+            document.getElementById('modal-info').innerText = `${isFormas ? '🥋 POOMSAE' : '🥊 KYORUGUI'} - ${graficaActiva.categoria}`;
+            
+            const selects = ['oro', 'plata', 'bronce1', 'bronce2'];
+            const compData = graficaActiva.competidores_data || [];
+
+            selects.forEach(pos => {
+                const select = document.getElementById(`select-${pos}`);
+                let options = `<option value="">-- Seleccionar --</option>`;
+                compData.forEach(c => {
+                    options += `<option value="${c.id}">${c.nombre}</option>`;
+                });
+                select.innerHTML = options;
+            });
+
+            document.getElementById('modal-juez').style.display = 'flex';
+        }
+
+        function cerrarModal() {
+            document.getElementById('modal-juez').style.display = 'none';
+            graficaActiva = null;
+        }
+
+        async function enviarResultados() {
+            const oro = document.getElementById('select-oro').value;
+            const btn = document.getElementById('btn-submit');
+
+            if (!oro) {
+                alert("⚠️ Debes seleccionar al menos un ganador (1er Lugar).");
+                return;
+            }
+
+            const resultados = {
+                oro: oro,
+                plata: document.getElementById('select-plata').value,
+                bronce1: document.getElementById('select-bronce1').value,
+                bronce2: document.getElementById('select-bronce2').value
+            };
+
+            btn.innerText = "⏳ Guardando...";
+            btn.disabled = true;
+
+            const res = await API.registrarResultado(graficaActiva.id, resultados);
+            
+            btn.innerText = "Guardar Resultados";
+            btn.disabled = false;
+
+            if (res && res.ok) {
+                cerrarModal();
+                // Desaparecemos la gráfica visualmente de inmediato para que el juez siga con la que sigue
+                graficaActiva.estado = 'FINALIZADA'; 
+                renderizarLista(); 
+            } else {
+                alert("❌ Error al guardar. Verifica tu conexión.");
+            }
+        }
+    </script>
+</body>
+</html>
