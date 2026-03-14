@@ -240,9 +240,7 @@
             border-left: 6px solid var(--status-danger);
         }
 
-        /* ========================================== */
-        /* ESTILOS: RANKING Y JUECES                  */
-        /* ========================================== */
+        /* ESTILOS: RANKING Y JUECES */
         .modal-juez-container {
             display: none;
             position: fixed;
@@ -371,17 +369,17 @@
         };
     </script>
 
-    <script src="assets/js/mockData.js?v=2"></script>
-    <script src="assets/js/api.js?v=2"></script>
-    <script src="assets/js/app.js?v=2"></script>
-    <script src="assets/js/areas.js?v=2"></script>
+    <script src="assets/js/api.js?v=3"></script>
+    <script src="assets/js/app.js?v=3"></script>
+    <script src="assets/js/areas.js?v=3"></script>
     <script src="assets/js/graficas.js?v=3"></script>
-    <script src="assets/js/validacion.js?v=2"></script>
-    <script src="assets/js/alumnos.js?v=2"></script>
-    <script src="assets/js/jueces.js?v=2"></script>
+    <script src="assets/js/validacion.js?v=3"></script>
+    <script src="assets/js/alumnos.js?v=3"></script>
+    <script src="assets/js/jueces.js?v=3"></script>
 
     <script>
         window.onload = async () => {
+            console.log("Iniciando aplicación AMMDK...");
             if (typeof App !== 'undefined') {
                 await App.init(); 
             }
@@ -394,7 +392,34 @@
             const btns = document.querySelectorAll('.nav-item');
             btns.forEach(b => b.classList.remove('active'));
             if(event && event.target) event.target.classList.add('active');
+            
+            document.getElementById('page-title').innerText = view.replace(/^\w/, c => c.toUpperCase());
             if (typeof App !== 'undefined') App.renderView(view);
+        }
+
+        async function mostrarRanking(e) {
+            const btns = document.querySelectorAll('.nav-item');
+            btns.forEach(b => b.classList.remove('active'));
+            if(e && e.target) e.target.classList.add('active');
+
+            document.getElementById('main-content').style.display = 'none';
+            document.getElementById('vista-ranking').style.display = 'block';
+            document.getElementById('page-title').innerText = "Ranking por Escuelas";
+
+            if (typeof App !== 'undefined') {
+                const ranking = await API.getRanking();
+                const tbody = document.getElementById('tabla-ranking-body');
+                tbody.innerHTML = ranking.map((r, i) => `
+                    <tr>
+                        <td><strong>#${i + 1}</strong></td>
+                        <td style="font-weight: bold; color: var(--mdk-green);">${r.escuela}</td>
+                        <td style="text-align: center;">${r.oros}</td>
+                        <td style="text-align: center;">${r.platas}</td>
+                        <td style="text-align: center;">${r.bronces}</td>
+                        <td style="text-align: right; font-weight: bold; color: var(--mdk-green);">${r.puntos_totales} pts</td>
+                    </tr>
+                `).join('');
+            }
         }
 
         function closeDrawer() {
