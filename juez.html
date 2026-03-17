@@ -167,10 +167,11 @@
 
     <script>
         window.APP_CONFIG = {
+            // URL ACTUALIZADA
             WEB_APP_URL: "https://script.google.com/macros/s/AKfycby8qJjsSir7OtawmfjJRipPLxueTSHa9XRXhWbGGk2nqe-tOm8GhYnrLhGFfZ-w7-__/exec",
         };
     </script>
-    <script src="assets/js/api.js?v=4"></script>
+    <script src="assets/js/api.js?v=5"></script>
 
     <script>
         let todasLasGraficas = [];
@@ -186,7 +187,7 @@
                 todasLasGraficas = await API.getGraficas() || [];
                 renderizarLista();
             } catch (error) {
-                alert("Error de conexión.");
+                alert("Error de conexión. Verifica la URL de la App Web y los permisos.");
                 volverAreas();
             }
         }
@@ -258,7 +259,7 @@
             selects.forEach(id => {
                 const otro = document.getElementById(id);
                 if (otro !== elemento && otro.value === valor) {
-                    alert("⚠️ Alumno ya seleccionado.");
+                    alert("⚠️ Alumno ya seleccionado para otra medalla.");
                     elemento.value = "";
                 }
             });
@@ -269,7 +270,7 @@
             const plata = document.getElementById('select-plata').value;
             const b1 = document.getElementById('select-bronce1').value;
             const b2 = document.getElementById('select-bronce2').value;
-            if (!oro) return alert("⚠️ Selecciona el Oro.");
+            if (!oro) return alert("⚠️ Selecciona al menos el 1er lugar.");
             const seleccionados = [oro, plata, b1, b2].filter(v => v !== "");
             if (new Set(seleccionados).size !== seleccionados.length) return alert("❌ No dupliques alumnos.");
             const btn = document.getElementById('btn-submit');
