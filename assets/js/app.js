@@ -1,4 +1,6 @@
+// ==========================================
 // Manejo del Panel Lateral (Drawer)
+// ==========================================
 const Drawer = {
     open: function(content) {
         document.getElementById('drawer-content').innerHTML = content;
@@ -11,37 +13,61 @@ const Drawer = {
     }
 };
 
-// Motor Principal de la Aplicación
+// ==========================================
+// Motor Principal de la Aplicación (App)
+// ==========================================
 const App = {
     data: {
         resumen: null,
         areas: null,
         graficas: null,
-        alertas: null
+        alertas: null,
+        ranking: null
     },
 
     init: async function() {
-        document.getElementById('main-content').innerHTML = "<h3 style='color:var(--mdk-green); text-align:center; padding:40px; font-family:Montserrat;'>Sincronizando con Google Sheets...</h3>";
-        await this.loadData();
-        this.renderView('dashboard');
+        try {
+            document.getElementById('main-content').innerHTML = "<h3 style='color:var(--mdk-green); text-align:center; padding:40px; font-family:Montserrat;'>Sincronizando con Google Sheets...</h3>";
+            await this.loadData();
+            this.renderView('dashboard');
+        } catch (error) {
+            console.error("[App Init] Error fatal:", error);
+            document.getElementById('main-content').innerHTML = `
+                <div style="text-align:center; padding:50px;">
+                    <h3 style="color:var(--status-danger); font-family:Montserrat; margin-bottom:15px;">⚠️ Error de Conexión</h3>
+                    <p>El sistema no pudo descargar los datos de Google Sheets. Asegúrate de haber dado los permisos necesarios.</p>
+                    <button onclick="location.reload()" style="margin-top:20px; padding:10px 20px; background:var(--mdk-green); color:white; border:none; border-radius:4px; cursor:pointer;">Reintentar</button>
+                </div>`;
+        }
     },
 
-    // NUEVO: Función para recargar los datos silenciosamente sin parpadear la pantalla completa
+    // Función para recargar los datos silenciosamente
     refresh: async function(currentView = 'dashboard') {
         console.log("Refrescando datos desde el servidor...");
         await this.loadData();
-        this.renderView(currentView);
+        if (currentView === 'ranking') {
+            this.cargarRanking();
+        } else {
+            this.renderView(currentView);
+        }
     },
 
+    // OPTIMIZADO: Descarga en paralelo (Modo Turbo) con escudo de errores
     loadData: async function() {
-        // Intentar cargar desde Apps Script (API)
         let resumenData = null, areasData = null, graficasData = null, alertasData = null;
         
-        if (typeof API !== 'undefined') {
-            resumenData = await API.getResumen();
-            areasData = await API.getAreas();
-            graficasData = await API.getGraficas();
-            alertasData = await API.getValidaciones();
+        try {
+            if (typeof API !== 'undefined') {
+                // Promise.all permite que las 4 descargas ocurran al mismo tiempo
+                [resumenData, areasData, graficasData, alertasData] = await Promise.all([
+                    API.getResumen().catch(() => null),
+                    API.getAreas().catch(() => null),
+                    API.getGraficas().catch(() => null),
+                    API.getValidaciones().catch(() => null)
+                ]);
+            }
+        } catch(e) {
+            console.error("Error en la descarga masiva de datos", e);
         }
 
         // Fallback a MOCK_DATA si la API falla o no está lista
@@ -75,8 +101,52 @@ const App = {
         }
     },
 
+    // NUEVA FUNCIÓN: Se conecta con el index.html para pintar el medallero
+    cargarRanking: async function() {
+        const tbody = document.getElementById('tabla-ranking-body');
+        if(!tbody) return;
+        
+        tbody.innerHTML = "<tr><td colspan='6' style='text-align:center; padding:20px;'>Cargando puntuaciones...</td></tr>";
+        
+        try {
+            const rankingData = await API.getRanking();
+            this.data.ranking = rankingData;
+
+            if (!rankingData || rankingData.length === 0) {
+                tbody.innerHTML = "<tr><td colspan='6' style='text-align:center; padding:20px; color:#666;'>No hay resultados registrados aún en el torneo.</td></tr>";
+                return;
+            }
+
+            let html = "";
+            rankingData.forEach((escuela, index) => {
+                const pos = index + 1;
+                let trofeo = pos;
+                let clasePosicion = "";
+                
+                if (pos === 1) { trofeo = "🏆 1"; clasePosicion = "posicion-oro"; }
+                if (pos === 2) { trofeo = "🥈 2"; }
+                if (pos === 3) { trofeo = "🥉 3"; }
+
+                html += `
+                    <tr class="${clasePosicion}">
+                        <td style="font-weight:bold; text-align:center; font-size:1.1rem;">${trofeo}</td>
+                        <td style="font-weight:bold; color:var(--mdk-black);">${escuela.escuela || 'Independiente'}</td>
+                        <td style="text-align:center;">${escuela.oros || 0}</td>
+                        <td style="text-align:center;">${escuela.platas || 0}</td>
+                        <td style="text-align:center;">${escuela.bronces || 0}</td>
+                        <td style="text-align:right; font-weight:bold; font-size:1.2rem; color:var(--mdk-green);">${escuela.puntos_totales || 0}</td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        } catch (error) {
+            console.error("Error al cargar ranking", error);
+            tbody.innerHTML = "<tr><td colspan='6' style='text-align:center; color:red; padding:20px;'>Error al cargar los datos del Ranking. Revisa la conexión.</td></tr>";
+        }
+    },
+
     templateDashboard: function() {
-        const r = this.data.resumen;
+        const r = this.data.resumen || {};
         // Validación de seguridad por si alertas es un array o un número
         const totalAlertas = Array.isArray(r.alertas) ? r.alertas.length : (r.alertas || 0);
 
@@ -96,14 +166,13 @@ const App = {
             
             <div style="margin-top: 30px; background: white; padding: 25px; border-radius: 4px; border: 1px solid #ddd;">
                 <h3 style="color: var(--mdk-green); margin-bottom: 15px; font-family:'Montserrat'">Acciones Rápidas</h3>
-                <button onclick="App.triggerGenerar(event)" style="background:var(--mdk-green); color:var(--mdk-yellow); padding: 12px 25px; font-weight: bold; border: none; cursor: pointer; border-radius: 4px; font-family: 'Montserrat'; text-transform:uppercase; transition: 0.3s;">
+                <button onclick="App.triggerGenerar(event)" style="background:var(--mdk-green); color:var(--mdk-yellow); padding: 12px 25px; font-weight: bold; border: none; cursor: pointer; border-radius: 4px; font-family: 'Montserrat'; text-transform:uppercase; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
                     ⚡ Generar Gráficas Automáticamente
                 </button>
             </div>
         `;
     },
 
-    // CORREGIDO: Ahora sí se comunica con Google para generar las gráficas
     triggerGenerar: async function(event) {
         if(confirm("¿Estás seguro de generar nuevas gráficas? Esto conectará con tu Google Sheets y recalculará todo.")){
             const btn = event.target;
@@ -121,7 +190,7 @@ const App = {
                     alert("Hubo un error al generar las gráficas.");
                 }
             } catch(e) {
-                alert("El servidor está procesando demasiados datos en segundo plano. Refresca la página en 1 minuto.");
+                alert("El servidor está procesando la solicitud. Refresca la página en unos segundos.");
             } finally {
                 btn.innerText = textoOriginal;
                 btn.disabled = false;
