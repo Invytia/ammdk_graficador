@@ -6,6 +6,7 @@
     <title>Panel de Juez | AMMDK</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
+        /* PALETA MDK OFICIAL */
         :root {
             --mdk-green: #006837;
             --mdk-yellow: #f9ed32;
@@ -13,41 +14,92 @@
             --mdk-white: #ffffff;
             --mdk-gray: #f2f2f2;
             --status-danger: #c0392b;
+            --mdk-poomsae: #2980b9;
         }
+
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Open Sans', sans-serif; }
+
         body { background-color: var(--mdk-gray); color: var(--mdk-black); padding-bottom: 50px; }
-        header { background-color: var(--mdk-green); color: var(--mdk-white); padding: 20px; text-align: center; border-bottom: 5px solid var(--mdk-yellow); position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+
+        /* HEADER */
+        header {
+            background-color: var(--mdk-green);
+            color: var(--mdk-white);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 5px solid var(--mdk-yellow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
         header h1 { font-family: 'Montserrat', sans-serif; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 1px; }
         header p { font-size: 0.8rem; color: var(--mdk-yellow); font-weight: bold; margin-top: 5px; }
+
         .container { padding: 20px; max-width: 800px; margin: 0 auto; }
+
+        /* PANTALLA 1: SELECTOR DE ÁREA */
         #pantalla-areas { text-align: center; }
-        .area-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-top: 20px; }
-        .btn-area { background-color: var(--mdk-white); border: 3px solid var(--mdk-green); border-radius: 8px; padding: 30px 10px; font-size: 1.2rem; font-weight: bold; color: var(--mdk-green); cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: transform 0.1s; }
+        .area-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .btn-area {
+            background-color: var(--mdk-white); border: 3px solid var(--mdk-green); border-radius: 8px;
+            padding: 30px 10px; font-size: 1.2rem; font-weight: bold; color: var(--mdk-green);
+            cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: all 0.2s ease;
+        }
         .btn-area:active { transform: scale(0.95); background-color: var(--mdk-green); color: var(--mdk-yellow); }
+
+        /* PANTALLA 2: LISTA DE COMBATES */
         #pantalla-combates { display: none; }
-        .btn-volver { background: transparent; border: none; color: var(--mdk-green); font-weight: bold; font-size: 1rem; margin-bottom: 20px; cursor: pointer; display: flex; align-items: center; }
+        .btn-volver {
+            background: transparent; border: none; color: var(--mdk-green); font-weight: bold; font-size: 1rem;
+            margin-bottom: 20px; cursor: pointer; display: flex; align-items: center;
+        }
         .btn-volver::before { content: '←'; margin-right: 5px; font-size: 1.2rem; }
-        .tarjeta-grafica { background: white; border-radius: 8px; padding: 20px; margin-bottom: 15px; border-left: 6px solid var(--mdk-green); box-shadow: 0 4px 10px rgba(0,0,0,0.08); display: flex; flex-direction: column; gap: 10px; }
-        .tarjeta-grafica.poomsae { border-left-color: #2980b9; }
-        .tarjeta-grafica.kyorugui { border-left-color: #c0392b; }
+
+        .tarjeta-grafica {
+            background: white; border-radius: 8px; padding: 20px; margin-bottom: 15px;
+            border-left: 8px solid var(--mdk-green); box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .tarjeta-grafica.poomsae { border-left-color: var(--mdk-poomsae); }
+        .tarjeta-grafica.kyorugui { border-left-color: var(--status-danger); }
+
         .tg-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; }
         .tg-id { font-weight: bold; color: #666; font-size: 0.8rem; }
         .badge-mod { padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; color: white; letter-spacing: 0.5px; }
-        .bg-poomsae { background-color: #2980b9; }
-        .bg-kyorugui { background-color: #c0392b; }
+        .bg-poomsae { background-color: var(--mdk-poomsae); }
+        .bg-kyorugui { background-color: var(--status-danger); }
+
         .tg-body h3 { font-family: 'Montserrat', sans-serif; font-size: 1.1rem; color: var(--mdk-black); }
         .tg-body p { font-size: 0.9rem; color: #666; margin-top: 5px; }
         .tg-competidores { margin-top: 15px; background: var(--mdk-gray); padding: 10px; border-radius: 4px; font-weight: 600; font-size: 0.95rem; text-align: center; }
-        .btn-calificar { background-color: var(--mdk-green); color: var(--mdk-yellow); border: none; padding: 15px; border-radius: 4px; font-size: 1rem; font-weight: bold; text-transform: uppercase; cursor: pointer; margin-top: 10px; width: 100%; }
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 999; justify-content: center; align-items: center; padding: 20px; }
-        .modal-content { background: white; padding: 25px; border-radius: 8px; width: 100%; max-width: 400px; max-height: 90vh; overflow-y: auto; border-top: 5px solid var(--mdk-green); }
+
+        .btn-calificar {
+            background-color: var(--mdk-green); color: var(--mdk-yellow); border: none;
+            padding: 15px; border-radius: 4px; font-size: 1rem; font-weight: bold;
+            text-transform: uppercase; cursor: pointer; margin-top: 10px; width: 100%; transition: 0.2s;
+        }
+        .btn-calificar:active { background-color: var(--mdk-black); }
+
+        /* MODAL */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 999; justify-content: center; align-items: center; padding: 20px; }
+        .modal-content { background: white; padding: 25px; border-radius: 8px; width: 100%; max-width: 400px; max-height: 90vh; overflow-y: auto; border-top: 6px solid var(--mdk-green); }
         .modal-content h2 { font-family: 'Montserrat'; color: var(--mdk-green); text-align: center; margin-bottom: 5px; }
-        .modal-content p.info { text-align: center; font-size: 0.85rem; color: #666; font-weight: bold; margin-bottom: 20px; }
+        .modal-content p.info { text-align: center; font-size: 0.85rem; color: #666; font-weight: bold; margin-bottom: 20px; text-transform: uppercase; }
+        
         .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.9rem; }
-        .form-group select { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 1rem; background: var(--mdk-gray); outline: none; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.9rem; color: var(--mdk-black); }
+        .form-group select { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 1rem; background: var(--mdk-gray); outline: none; transition: 0.3s; }
+        .form-group select:focus { border-color: var(--mdk-green); background: white; }
+
         .btn-guardar { background-color: var(--mdk-green); color: white; border: none; padding: 15px; border-radius: 6px; font-size: 1.1rem; font-weight: bold; cursor: pointer; width: 100%; text-transform: uppercase; margin-top: 10px; }
         .btn-cancelar { background: transparent; color: var(--status-danger); border: none; padding: 15px; font-size: 1rem; font-weight: bold; cursor: pointer; width: 100%; margin-top: 5px; text-decoration: underline; }
+
         #loader { text-align: center; padding: 50px; display: none; }
         .spinner { border: 4px solid rgba(0,0,0,0.1); width: 40px; height: 40px; border-radius: 50%; border-left-color: var(--mdk-green); animation: spin 1s linear infinite; margin: 0 auto 15px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -55,7 +107,12 @@
     </style>
 </head>
 <body>
-    <header><h1>Panel de Juez</h1><p>Asociación Mexicana MDK</p></header>
+
+    <header>
+        <h1>Panel de Juez</h1>
+        <p>Asociación Mexicana MDK</p>
+    </header>
+
     <div class="container">
         <div id="pantalla-areas">
             <h2 style="font-family: 'Montserrat'; color: var(--mdk-green); margin-bottom: 10px;">Selecciona tu Área</h2>
@@ -70,7 +127,12 @@
                 <button class="btn-area" onclick="seleccionarArea(8)">Área 8</button>
             </div>
         </div>
-        <div id="loader"><div class="spinner"></div><p style="color: var(--mdk-green); font-weight: bold;">Sincronizando...</p></div>
+
+        <div id="loader">
+            <div class="spinner"></div>
+            <p style="color: var(--mdk-green); font-weight: bold;">Sincronizando con el servidor...</p>
+        </div>
+
         <div id="pantalla-combates">
             <button class="btn-volver" onclick="volverAreas()">Cambiar Área</button>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
@@ -85,6 +147,7 @@
         <div class="modal-content">
             <h2>🏆 Calificar Gráfica</h2>
             <p id="modal-info" class="info"></p>
+            
             <div class="form-group">
                 <label>🥇 1er Lugar (Oro):</label>
                 <select id="select-oro" onchange="validarSeleccionUnica(this)"></select>
@@ -101,6 +164,7 @@
                 <label>🥉 3er Lugar (Bronce 2):</label>
                 <select id="select-bronce2" onchange="validarSeleccionUnica(this)"></select>
             </div>
+
             <button onclick="enviarResultados()" class="btn-guardar" id="btn-submit">Guardar Resultados</button>
             <button onclick="cerrarModal()" class="btn-cancelar">Cancelar</button>
         </div>
@@ -111,7 +175,8 @@
             WEB_APP_URL: "https://script.google.com/macros/s/AKfycbykVKjXgHY_hykZ4WXficxYCWlAiekgUYsyFqn-8-6hV64pQvSgdHOsPGUZdsN4EFZLDg/exec",
         };
     </script>
-    <script src="assets/js/api.js?v=5"></script>
+    
+    <script src="assets/js/api.js?v=6"></script>
 
     <script>
         let todasLasGraficas = [];
@@ -123,22 +188,43 @@
             document.getElementById('loader').style.display = 'block';
             areaActual = areaNum;
             document.getElementById('titulo-area').innerText = `Área ${areaNum}`;
+            
             try {
-                todasLasGraficas = await API.getGraficas() || [];
+                // Forzar limpieza de datos previos
+                todasLasGraficas = [];
+                const res = await API.getGraficas();
+                todasLasGraficas = res || [];
                 renderizarLista();
             } catch (error) {
-                alert("Error de conexión. Verifica la implementación en Google Apps Script.");
+                console.error("Error al cargar gráficas:", error);
+                alert("Error de conexión. Asegúrate de haber autorizado el script en Google.");
                 volverAreas();
             }
         }
-        function volverAreas() { document.getElementById('pantalla-combates').style.display = 'none'; document.getElementById('pantalla-areas').style.display = 'block'; areaActual = null; }
+
+        function volverAreas() {
+            document.getElementById('pantalla-combates').style.display = 'none';
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('pantalla-areas').style.display = 'block';
+            areaActual = null;
+        }
+
         function renderizarLista() {
             document.getElementById('loader').style.display = 'none';
             document.getElementById('pantalla-combates').style.display = 'block';
             const contenedor = document.getElementById('lista-graficas');
-            const pendientes = todasLasGraficas.filter(g => String(g.area) === String(areaActual) && String(g.estado).toUpperCase() !== 'FINALIZADA');
+            
+            const pendientes = todasLasGraficas.filter(g => 
+                String(g.area) === String(areaActual) && String(g.estado).toUpperCase() !== 'FINALIZADA'
+            );
+
             document.getElementById('contador-pendientes').innerText = `${pendientes.length} Pendientes`;
-            if (pendientes.length === 0) { contenedor.innerHTML = `<div class="mensaje-vacio">🎉 Sin pendientes en esta área.</div>`; return; }
+
+            if (pendientes.length === 0) {
+                contenedor.innerHTML = `<div class="mensaje-vacio">🎉 ¡Gran trabajo! No hay gráficas pendientes en esta área.</div>`;
+                return;
+            }
+
             let html = '';
             pendientes.forEach(g => {
                 const esFormas = String(g.modalidad).toUpperCase().includes('FORMA');
@@ -146,48 +232,95 @@
                 const card = esFormas ? 'poomsae' : 'kyorugui';
                 const modTxt = esFormas ? '🥋 POOMSAE' : '🥊 KYORUGUI';
                 const compData = g.competidores_data || [];
-                const nombres = compData.map(c => c.nombre).join(' <span style="color:red">vs</span> ');
-                html += `<div class="tarjeta-grafica ${card}"><div class="tg-header"><span class="tg-id">ID: ${g.id.substring(0,6)}</span><span class="badge-mod ${badge}">${modTxt}</span></div><div class="tg-body"><h3>${g.categoria || 'MDK'}</h3><p>${g.cinta || ''}</p><div class="tg-competidores">${nombres}</div></div><button class="btn-calificar" onclick="abrirModal('${g.id}')">🎖️ Calificar</button></div>`;
+                const nombres = compData.map(c => c.nombre).join(' <span style="color:var(--status-danger)">vs</span> ');
+                
+                html += `
+                    <div class="tarjeta-grafica ${card}">
+                        <div class="tg-header">
+                            <span class="tg-id">ID: ${g.id.substring(0,6)}</span>
+                            <span class="badge-mod ${badge}">${modTxt}</span>
+                        </div>
+                        <div class="tg-body">
+                            <h3>${g.categoria || 'Categoría Única'}</h3>
+                            <p>${g.cinta || 'Cintas Mixtas'}</p>
+                            <div class="tg-competidores">${nombres}</div>
+                        </div>
+                        <button class="btn-calificar" onclick="abrirModal('${g.id}')">🎖️ Calificar Ganadores</button>
+                    </div>`;
             });
             contenedor.innerHTML = html;
         }
+
         function abrirModal(id) {
             graficaActiva = todasLasGraficas.find(g => g.id === id);
             if (!graficaActiva) return;
+
             document.getElementById('modal-info').innerText = `${graficaActiva.modalidad} - ${graficaActiva.categoria}`;
             const selects = ['select-oro', 'select-plata', 'select-bronce1', 'select-bronce2'];
             const compData = graficaActiva.competidores_data || [];
+
             selects.forEach(sId => {
                 const s = document.getElementById(sId);
                 let opt = `<option value="">-- Seleccionar --</option>`;
                 compData.forEach(c => { opt += `<option value="${c.id}">${c.nombre}</option>`; });
                 s.innerHTML = opt;
+                s.value = ""; // Limpiar selecciones previas
             });
+
             document.getElementById('modal-juez').style.display = 'flex';
         }
-        function cerrarModal() { document.getElementById('modal-juez').style.display = 'none'; }
+
+        function cerrarModal() { 
+            document.getElementById('modal-juez').style.display = 'none'; 
+            graficaActiva = null;
+        }
+
         function validarSeleccionUnica(elemento) {
             const selects = ['select-oro', 'select-plata', 'select-bronce1', 'select-bronce2'];
             const valor = elemento.value;
             if (!valor) return;
+
             selects.forEach(id => {
                 const otro = document.getElementById(id);
-                if (otro !== elemento && otro.value === valor) { alert("⚠️ Alumno ya seleccionado."); elemento.value = ""; }
+                if (otro !== elemento && otro.value === valor) {
+                    alert("⚠️ Error: El mismo alumno no puede recibir dos medallas en la misma gráfica.");
+                    elemento.value = "";
+                }
             });
         }
+
         async function enviarResultados() {
             const oro = document.getElementById('select-oro').value;
             const plata = document.getElementById('select-plata').value;
             const b1 = document.getElementById('select-bronce1').value;
             const b2 = document.getElementById('select-bronce2').value;
-            if (!oro) return alert("⚠️ Selecciona el Oro.");
+
+            if (!oro) return alert("⚠️ Debes asignar al menos la medalla de Oro.");
+
             const seleccionados = [oro, plata, b1, b2].filter(v => v !== "");
-            if (new Set(seleccionados).size !== seleccionados.length) return alert("❌ No dupliques alumnos.");
+            if (new Set(seleccionados).size !== seleccionados.length) {
+                return alert("❌ Error: Hay alumnos duplicados en el medallero.");
+            }
+
             const btn = document.getElementById('btn-submit');
-            btn.innerText = "⏳ Guardando..."; btn.disabled = true;
-            const res = await API.registrarResultado(graficaActiva.id, { oro, plata, bronce1: b1, bronce2: b2 });
-            if (res && res.ok) { cerrarModal(); graficaActiva.estado = 'FINALIZADA'; renderizarLista(); }
-            else { alert("Error al guardar."); btn.disabled = false; btn.innerText = "Guardar Resultados"; }
+            const originalText = btn.innerText;
+            btn.innerText = "⏳ Sincronizando..."; 
+            btn.disabled = true;
+
+            try {
+                const res = await API.registrarResultado(graficaActiva.id, { oro, plata, bronce1: b1, bronce2: b2 });
+                if (res && res.ok) { 
+                    cerrarModal(); 
+                    graficaActiva.estado = 'FINALIZADA'; 
+                    renderizarLista(); 
+                } else {
+                    throw new Error("Fallo en servidor");
+                }
+            } catch (e) {
+                alert("❌ Error al guardar. Verifica tu conexión a internet.");
+                btn.disabled = false;
+                btn.innerText = originalText;
+            }
         }
     </script>
 </body>
