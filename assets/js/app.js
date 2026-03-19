@@ -56,27 +56,43 @@ const App = {
         this.data.alertas = alertasData || [];
     },
 
+    // AQUI ESTA LA MAGIA REPARADA
     renderView: function(view) {
         const container = document.getElementById('main-content');
         const title = document.getElementById('page-title');
         
-        switch(view) {
-            case 'dashboard':
-                title.innerText = "Resumen Operativo";
-                container.innerHTML = this.templateDashboard();
-                break;
-            case 'areas':
-                title.innerText = "Mapa de Áreas de Competencia";
-                if (typeof Areas !== 'undefined') Areas.render(container);
-                break;
-            case 'graficas':
-                title.innerText = "Listado de Gráficas";
-                if (typeof Graficas !== 'undefined') Graficas.render(container);
-                break;
-            case 'alertas':
-                title.innerText = "Conflictos y Alertas";
-                if (typeof Validacion !== 'undefined') Validacion.render(container);
-                break;
+        // 1. Limpiamos la pantalla ("borramos el pizarrón")
+        container.innerHTML = '<div style="text-align:center; padding:40px; color:#666;">Cargando vista...</div>';
+        
+        // 2. Intentamos pintar lo nuevo
+        try {
+            switch(view) {
+                case 'dashboard':
+                    title.innerText = "Resumen Operativo";
+                    container.innerHTML = this.templateDashboard();
+                    break;
+                case 'areas':
+                    title.innerText = "Mapa de Áreas de Competencia";
+                    if (typeof Areas !== 'undefined') Areas.render(container);
+                    else container.innerHTML = "<p style='color:red; text-align:center; padding:20px;'>Falta el archivo areas.js</p>";
+                    break;
+                case 'graficas':
+                    title.innerText = "Listado de Gráficas";
+                    if (typeof Graficas !== 'undefined') Graficas.render(container);
+                    else container.innerHTML = "<p style='color:red; text-align:center; padding:20px;'>Falta el archivo graficas.js</p>";
+                    break;
+                case 'alertas':
+                    title.innerText = "Conflictos y Alertas";
+                    if (typeof Validacion !== 'undefined') Validacion.render(container);
+                    else container.innerHTML = "<p style='color:red; text-align:center; padding:20px;'>Falta el archivo validacion.js</p>";
+                    break;
+            }
+        } catch (error) {
+            console.error("Error al pintar la vista:", error);
+            container.innerHTML = `<div style="background:white; border-left:5px solid red; padding:20px; margin:20px;">
+                <h3 style="color:red; margin-bottom:10px;">⚠️ Error en el código de la vista</h3>
+                <p>${error.message}</p>
+            </div>`;
         }
     },
 
