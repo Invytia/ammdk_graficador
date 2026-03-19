@@ -1,9 +1,7 @@
 // ==========================================
-// SISTEMA DE ADMINISTRACIÓN AMMDK - app.js v3.0
-// Motor principal de renderizado y datos
+// SISTEMA DE ADMINISTRACIÓN AMMDK - app.js
 // ==========================================
 
-// Manejo del Panel Lateral (Drawer)
 const Drawer = {
     open: function(content) {
         document.getElementById('drawer-content').innerHTML = content;
@@ -16,14 +14,8 @@ const Drawer = {
     }
 };
 
-// Motor Principal de la Aplicación
 const App = {
-    data: {
-        resumen: null,
-        areas: null,
-        graficas: null,
-        alertas: null
-    },
+    data: { resumen: null, areas: null, graficas: null, alertas: null, ranking: null },
 
     init: async function() {
         try {
@@ -31,30 +23,24 @@ const App = {
             await this.loadData();
             this.renderView('dashboard');
         } catch (error) {
-            console.error("[App Init] Error fatal:", error);
             document.getElementById('main-content').innerHTML = `
                 <div style="text-align:center; padding:50px;">
                     <h3 style="color:var(--status-danger); font-family:Montserrat; margin-bottom:15px;">⚠️ Error de Conexión</h3>
-                    <p>El sistema no pudo descargar los datos de Google Sheets. Asegúrate de haber dado los permisos necesarios a la App Web.</p>
-                    <button onclick="location.reload()" style="margin-top:20px; padding:10px 20px; background:var(--mdk-green); color:white; border:none; border-radius:4px; cursor:pointer;">Reintentar Sincronización</button>
+                    <p>El sistema no pudo descargar los datos. Revisa la consola o recarga la página.</p>
                 </div>`;
         }
     },
 
-    // OPTIMIZADO: Carga en paralelo (Promise.all) para máxima velocidad
     refresh: async function(currentView = 'dashboard') {
-        console.log("Refrescando datos desde el servidor...");
         await this.loadData();
-        this.renderView(currentView);
+        if (currentView === 'ranking') this.cargarRanking();
+        else this.renderView(currentView);
     },
 
     loadData: async function() {
-        // Intentar cargar desde Apps Script (API)
         let resumenData = null, areasData = null, graficasData = null, alertasData = null;
-        
         try {
             if (typeof API !== 'undefined') {
-                // Descargamos los 4 bloques de datos al mismo tiempo
                 [resumenData, areasData, graficasData, alertasData] = await Promise.all([
                     API.getResumen().catch(() => null),
                     API.getAreas().catch(() => null),
@@ -62,15 +48,12 @@ const App = {
                     API.getValidaciones().catch(() => null)
                 ]);
             }
-        } catch(e) {
-            console.error("Error en la descarga masiva de datos", e);
-        }
+        } catch(e) { console.error("Error en descarga masiva", e); }
 
-        // Fallback a MOCK_DATA si la API falla o no está lista
-        this.data.resumen = resumenData || (typeof MOCK_DATA !== 'undefined' ? MOCK_DATA.resumen : {});
-        this.data.areas = areasData || (typeof MOCK_DATA !== 'undefined' ? MOCK_DATA.areas : []);
-        this.data.graficas = graficasData || (typeof MOCK_DATA !== 'undefined' ? MOCK_DATA.graficas : []);
-        this.data.alertas = alertasData || (typeof MOCK_DATA !== 'undefined' ? MOCK_DATA.alertas : []);
+        this.data.resumen = resumenData || {};
+        this.data.areas = areasData || [];
+        this.data.graficas = graficasData || [];
+        this.data.alertas = alertasData || [];
     },
 
     renderView: function(view) {
@@ -97,10 +80,40 @@ const App = {
         }
     },
 
-    // OPTIMIZADO: KPIs estilizados y el mapa de áreas con bordes distintivos
+    cargarRanking: async function() {
+        const tbody = document.getElementById('tabla-ranking-body');
+        if(!tbody) return;
+        tbody.innerHTML = "<tr><td colspan='6' style='text-align:center; padding:20px;'>Cargando puntuaciones...</td></tr>";
+        try {
+            const rankingData = await API.getRanking();
+            if (!rankingData || rankingData.length === 0) {
+                tbody.innerHTML = "<tr><td colspan='6' style='text-align:center; padding:20px;'>No hay resultados.</td></tr>";
+                return;
+            }
+            let html = "";
+            rankingData.forEach((escuela, index) => {
+                const pos = index + 1;
+                let trofeo = pos;
+                let clasePosicion = "";
+                if (pos === 1) { trofeo = "🏆 1"; clasePosicion = "posicion-oro"; }
+                if (pos === 2) { trofeo = "🥈 2"; }
+                if (pos === 3) { trofeo = "🥉 3"; }
+
+                html += `<tr class="${clasePosicion}">
+                    <td style="text-align:center; font-weight:bold;">${trofeo}</td>
+                    <td style="font-weight:bold;">${escuela.escuela || 'Independiente'}</td>
+                    <td style="text-align:center;">${escuela.oros || 0}</td>
+                    <td style="text-align:center;">${escuela.platas || 0}</td>
+                    <td style="text-align:center;">${escuela.bronces || 0}</td>
+                    <td style="text-align:right; font-weight:bold; color:var(--mdk-green);">${escuela.puntos_totales || 0}</td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
+        } catch (e) { tbody.innerHTML = "<tr><td colspan='6'>Error de ranking.</td></tr>"; }
+    },
+
     templateDashboard: function() {
-        const r = this.data.resumen || {}; // Manejo de objeto vacío de seguridad
-        // Validación de seguridad por si alertas es un array o un número
+        const r = this.data.resumen || {};
         const totalAlertas = Array.isArray(r.alertas) ? r.alertas.length : (r.alertas || 0);
 
         return `
@@ -126,37 +139,23 @@ const App = {
         `;
     },
 
-    // OPTIMIZADO: Manejo de errores en la generación remota
     triggerGenerar: async function(event) {
-        if(confirm("¿Estás seguro de generar nuevas gráficas? Esto conectará con tu Google Sheets y recalculará todo.")){
+        if(confirm("¿Seguro de generar gráficas? Esto conectará con Sheets y recalculará todo.")){
             const btn = event.target;
-            const textoOriginal = btn.innerText;
-            btn.innerText = "⚙️ Mandando orden a Google...";
+            const texto = btn.innerText;
+            btn.innerText = "⏳ Mandando orden a Google... (Espera 5s)";
             btn.disabled = true;
             btn.style.backgroundColor = "#7f8c8d";
-
             try {
-                // Mandamos la orden (es instantáneo)
                 await API.generarGraficas();
-                
-                // Cambiamos el texto para que sepas qué está pasando
-                btn.innerText = "⏳ Escribiendo en Excel... (Espera 4s)";
-                
-                // Le damos 4.5 segundos a Google Sheets para que termine su magia
                 setTimeout(async () => {
-                    alert("¡Gráficas generadas y áreas asignadas exitosamente!");
-                    await App.refresh('dashboard'); // Ahora sí, refrescamos
-                    
-                    btn.innerText = textoOriginal;
+                    alert("¡Gráficas generadas exitosamente!");
+                    await App.refresh('dashboard');
+                    btn.innerText = texto;
                     btn.disabled = false;
                     btn.style.backgroundColor = "var(--mdk-green)";
-                }, 4500); 
-
-            } catch(e) {
-                alert("Hubo un problema de red al enviar la orden.");
-                btn.innerText = textoOriginal;
-                btn.disabled = false;
-                btn.style.backgroundColor = "var(--mdk-green)";
-            }
+                }, 5000);
+            } catch(e) { alert("Error de red."); btn.disabled = false; btn.innerText = texto; }
         }
     }
+};
