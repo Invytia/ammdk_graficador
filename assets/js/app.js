@@ -131,25 +131,32 @@ const App = {
         if(confirm("¿Estás seguro de generar nuevas gráficas? Esto conectará con tu Google Sheets y recalculará todo.")){
             const btn = event.target;
             const textoOriginal = btn.innerText;
-            btn.innerText = "⚙️ Procesando en el servidor (Modo Turbo)...";
+            btn.innerText = "⚙️ Mandando orden a Google...";
             btn.disabled = true;
             btn.style.backgroundColor = "#7f8c8d";
 
             try {
-                const respuesta = await API.generarGraficas();
-                if(respuesta && respuesta.ok) {
+                // Mandamos la orden (es instantáneo)
+                await API.generarGraficas();
+                
+                // Cambiamos el texto para que sepas qué está pasando
+                btn.innerText = "⏳ Escribiendo en Excel... (Espera 4s)";
+                
+                // Le damos 4.5 segundos a Google Sheets para que termine su magia
+                setTimeout(async () => {
                     alert("¡Gráficas generadas y áreas asignadas exitosamente!");
-                    await this.refresh('dashboard'); // Recarga los datos y vuelve a pintar los KPIs y áreas
-                } else {
-                    alert("Hubo un error al generar las gráficas.");
-                }
+                    await App.refresh('dashboard'); // Ahora sí, refrescamos
+                    
+                    btn.innerText = textoOriginal;
+                    btn.disabled = false;
+                    btn.style.backgroundColor = "var(--mdk-green)";
+                }, 4500); 
+
             } catch(e) {
-                alert("El servidor está procesando demasiados datos en segundo plano. Refresca la página en 1 minuto.");
-            } finally {
+                alert("Hubo un problema de red al enviar la orden.");
                 btn.innerText = textoOriginal;
                 btn.disabled = false;
                 btn.style.backgroundColor = "var(--mdk-green)";
             }
         }
     }
-};
