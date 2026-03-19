@@ -14,26 +14,33 @@ const Areas = {
             <div class="arena-layout">
         `;
 
-        areasData.forEach(area => {
-            const statusColor = area.saturacion || 'verde'; // verde por defecto si no viene
-            
-            html += `
-                <div class="tatami status-${statusColor}" onclick="Areas.detalle(${area.id})">
-                    <h4>Área ${area.id}</h4>
-                    <div class="sbn">${area.sbn || 'Sin Asignar'}</div>
-                    <div class="stats">${area.graficasAsignadas || 0} Gráficas</div>
-                    <small style="margin-top:5px; color:#888;">${area.horarioBase || '--:--'}</small>
-                </div>
-            `;
-        });
+        // BLINDAJE 1: Mensaje elegante si no hay tatamis aún
+        if (areasData.length === 0) {
+            html += `<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #999; background: white; border-radius: 8px;">Aún no se han generado áreas de competencia.</div>`;
+        } else {
+            areasData.forEach(area => {
+                const statusColor = area.saturacion || 'verde'; 
+                
+                // BLINDAJE 2: Comillas en '${area.id}' para proteger contra IDs en formato texto
+                html += `
+                    <div class="tatami status-${statusColor}" onclick="Areas.detalle('${area.id}')">
+                        <h4>Área ${area.id}</h4>
+                        <div class="sbn">${area.sbn || 'Sin Asignar'}</div>
+                        <div class="stats">${area.graficasAsignadas || 0} Gráficas</div>
+                        <small style="margin-top:5px; color:#888;">${area.horarioBase || '--:--'}</small>
+                    </div>
+                `;
+            });
+        }
 
         html += `</div>`;
         container.innerHTML = html;
     },
 
     detalle: function(idArea) {
-        const area = App.data.areas.find(a => a.id === idArea);
-        const graficasArea = App.data.graficas.filter(g => g.area === idArea);
+        // BLINDAJE 3: Forzamos a String ambos valores para que la búsqueda NUNCA falle
+        const area = App.data.areas.find(a => String(a.id) === String(idArea));
+        const graficasArea = App.data.graficas.filter(g => String(g.area) === String(idArea));
         
         if (!area) return;
 
@@ -72,7 +79,6 @@ const Areas = {
 
         drawerHtml += `</div>`;
         
-        // Abrimos el panel lateral usando el método de app.js
         if (typeof Drawer !== 'undefined') {
             Drawer.open(drawerHtml);
         }
