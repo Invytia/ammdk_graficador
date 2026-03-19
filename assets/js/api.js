@@ -3,7 +3,7 @@
  * Conexión optimizada para Google Apps Script y GitHub Pages.
  */
 
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbykVKjXgHY_hykZ4WXficxYCWlAiekgUYsyFqn-8-6hV64pQvSgdHOsPGUZdsN4EFZLDg/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxlFiasgSVVYoL0sd4vWfmYjmWGX8VPqZihdXm8i8-yVS0YYxs-1FrUgIO-ILjL9iLYKg/exec";
 
 const API = {
     /**
