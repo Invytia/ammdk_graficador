@@ -1,6 +1,8 @@
 const Areas = {
     render: function(container) {
-        const areasData = App.data.areas || [];
+        // BLINDAJE EXTREMO: Si Google no manda una lista perfecta, forzamos una lista vacía para evitar el error .forEach
+        const rawData = App.data.areas;
+        const areasData = Array.isArray(rawData) ? rawData : [];
         
         let html = `
             <div style="margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center;">
@@ -14,14 +16,13 @@ const Areas = {
             <div class="arena-layout">
         `;
 
-        // BLINDAJE 1: Mensaje elegante si no hay tatamis aún
+        // Mensaje elegante si la lista está vacía
         if (areasData.length === 0) {
-            html += `<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #999; background: white; border-radius: 8px;">Aún no se han generado áreas de competencia.</div>`;
+            html += `<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #999; background: white; border-radius: 8px;">Aún no se han generado áreas de competencia o la hoja en Excel está vacía.</div>`;
         } else {
             areasData.forEach(area => {
                 const statusColor = area.saturacion || 'verde'; 
                 
-                // BLINDAJE 2: Comillas en '${area.id}' para proteger contra IDs en formato texto
                 html += `
                     <div class="tatami status-${statusColor}" onclick="Areas.detalle('${area.id}')">
                         <h4>Área ${area.id}</h4>
@@ -38,9 +39,12 @@ const Areas = {
     },
 
     detalle: function(idArea) {
-        // BLINDAJE 3: Forzamos a String ambos valores para que la búsqueda NUNCA falle
-        const area = App.data.areas.find(a => String(a.id) === String(idArea));
-        const graficasArea = App.data.graficas.filter(g => String(g.area) === String(idArea));
+        // Validaciones seguras para el panel lateral
+        const safeAreas = Array.isArray(App.data.areas) ? App.data.areas : [];
+        const safeGraficas = Array.isArray(App.data.graficas) ? App.data.graficas : [];
+
+        const area = safeAreas.find(a => String(a.id) === String(idArea));
+        const graficasArea = safeGraficas.filter(g => String(g.area) === String(idArea));
         
         if (!area) return;
 
