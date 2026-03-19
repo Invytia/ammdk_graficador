@@ -10,7 +10,8 @@ const Graficas = {
     },
 
     render: function(container) {
-        const graficas = App.data.graficas || [];
+        const rawGraficas = App.data.graficas;
+        const graficas = Array.isArray(rawGraficas) ? rawGraficas : [];
         
         // CRÍTICO: Guardamos en global para que el modal de Jueces sepa quién pelea
         window.datosGlobalesGraficas = graficas; 
@@ -69,6 +70,9 @@ const Graficas = {
                 const hasAlert = g.alerta && g.alerta !== "";
                 const rowStyle = hasAlert ? 'background-color: #fff5f5;' : '';
                 
+                // BLINDAJE: Aseguramos que el ID se trate como String
+                const idSeguro = String(g.id || 'SIN_ID');
+                
                 // Formateo de nombres
                 let competidoresNombres = [];
                 if (g.competidores_data) {
@@ -94,7 +98,7 @@ const Graficas = {
 
                 html += `
                     <tr style="${rowStyle}">
-                        <td><strong style="color: var(--mdk-green);">${g.id.substring(0,8)}...</strong></td>
+                        <td><strong style="color: var(--mdk-green);">${idSeguro.substring(0,8)}...</strong></td>
                         <td>
                             ${g.categoria || '--'} <br>
                             <small style="color:#666">${g.cinta || ''}</small><br>
@@ -111,7 +115,7 @@ const Graficas = {
                         </td>
                         <td>${badgeEstado}</td>
                         <td>
-                            <button onclick="abrirModalJuez('${g.id}')" style="background-color: var(--mdk-green); color: var(--mdk-yellow); border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.75rem; text-transform: uppercase; transition: all 0.2s ease;">
+                            <button onclick="abrirModalJuez('${idSeguro}')" style="background-color: var(--mdk-green); color: var(--mdk-yellow); border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.75rem; text-transform: uppercase; transition: all 0.2s ease;">
                                 🎖️ Juez
                             </button>
                         </td>
